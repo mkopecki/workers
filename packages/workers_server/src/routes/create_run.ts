@@ -23,7 +23,7 @@ export const create_run: H = async (c) => {
 
   const thread_state: typeof thread_states_table.$inferInsert = {
     id: cuid(),
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
     thread_id: thread.id,
     previous_thread_state_id: data.current_thread_state_id,
   };
@@ -32,7 +32,7 @@ export const create_run: H = async (c) => {
   // create run in datbase
   const run: typeof runs_table.$inferInsert = {
     id: cuid(),
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
 
     thread_state_id: thread_state.id,
     thread_id: data.thread_id,
