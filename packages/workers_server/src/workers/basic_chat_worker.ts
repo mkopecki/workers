@@ -30,7 +30,7 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
     if (config?.stream ?? true) {
       const message: typeof messages_table.$inferInsert = {
         id: cuid(),
-        created_at: new Date().toISOString(),
+        created_at: new Date(),
         thread_id: run.thread_id,
         thread_state_id: run.thread_state_id,
         role: "assistant",
@@ -75,9 +75,13 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
       });
 
       const content = completion.choices[0].message.content;
+      if (!content) {
+        throw new Error("output could not be generated");
+      }
+
       const message: typeof messages_table.$inferInsert = {
         id: cuid(),
-        created_at: new Date().toISOString(),
+        created_at: new Date(),
         thread_id: run.thread_id,
         thread_state_id: run.thread_state_id,
         role: "assistant",
@@ -90,7 +94,7 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
 
     const run_step: typeof run_steps_table.$inferInsert = {
       id: cuid(),
-      created_at: new Date().toISOString(),
+      created_at: new Date(),
       run_id: run.id,
       description: "generated message using model",
     };

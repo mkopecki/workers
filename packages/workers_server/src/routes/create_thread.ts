@@ -15,7 +15,7 @@ export const create_thread: H = async (c) => {
   // created thread
   const thread: typeof threads_table.$inferInsert = {
     id: cuid(),
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
     name: data.name,
     worker_id: data.worker_id,
     worker_config: data.worker_config,
@@ -26,7 +26,7 @@ export const create_thread: H = async (c) => {
   // create initial thread state
   const thread_state: typeof thread_states_table.$inferInsert = {
     id: cuid(),
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
     thread_id: thread.id,
     previous_thread_state_id: null,
   };

@@ -1,5 +1,4 @@
 import { thread_manager } from "@src/thread_manager";
-import { db } from "../db/db";
 import { messages_table, thread_states_table } from "../db/schema";
 import cuid from "cuid";
 import type { H } from "hono/types";
@@ -16,7 +15,7 @@ export const create_message: H = async (c) => {
   // create new thread state
   const thread_state: typeof thread_states_table.$inferInsert = {
     id: cuid(),
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
     thread_id,
     previous_thread_state_id: data.current_thread_state_id,
   };
@@ -27,7 +26,7 @@ export const create_message: H = async (c) => {
   const user_message: typeof messages_table.$inferInsert = {
     id: cuid(),
     role: "user",
-    created_at: new Date().toISOString(),
+    created_at: new Date(),
 
     thread_state_id: thread_state.id,
 

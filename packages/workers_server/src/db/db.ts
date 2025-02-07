@@ -1,3 +1,3 @@
-import { drizzle } from "drizzle-orm/bun-sqlite";
+import { drizzle } from "drizzle-orm/node-postgres";
 
-export const db = drizzle(process.env.DB_FILE_NAME!);
+export const db = drizzle(process.env.DB_URL!);
