@@ -1,0 +1,9 @@
+version: '3'
+services:
+  workers_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - './db.sqlite:/usr/src/db.sqlite'
+    command: 'bash -c "cargo watch -x run"'
