@@ -16,7 +16,7 @@
   "dependencies": {
     "@hono/zod-validator": "^0.4.2",
     "cuid": "^3.0.0",
-    "drizzle-orm": "^0.39.2",
+    "drizzle-orm": "^1.39.2",
     "hono": "^4.6.15",
     "openai": "^4.77.0",
     "pg": "^8.13.1",

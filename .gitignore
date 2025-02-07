@@ -1,3 +1,5 @@
+bun.lockb
+pg_data
 *.sqlite
 
 ### Node ###

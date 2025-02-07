@@ -28,7 +28,7 @@ export const thread_states_table = pgTable("thread_state", {
   previous_thread_state_id: text(),
 });
 
-const run_status = pgEnum("run_status", ["processing", "done", "error"]);
+export const run_status = pgEnum("run_status", ["processing", "done", "error"]);
 export const runs_table = pgTable("run", {
   id: text().primaryKey(),
   created_at: timestamp().defaultNow().notNull(),
@@ -56,8 +56,8 @@ export const run_steps_table = pgTable("run_step", {
   description: text().notNull(),
 });
 
-const message_role = pgEnum("message_role", ["system", "assistant", "user"]);
-const message_status = pgEnum("message_status", ["generating", "done"]);
+export const message_role = pgEnum("message_role", ["system", "assistant", "user"]);
+export const message_status = pgEnum("message_status", ["generating", "done"]);
 export const messages_table = pgTable("message", {
   id: text().primaryKey(),
   created_at: timestamp().defaultNow().notNull(),
