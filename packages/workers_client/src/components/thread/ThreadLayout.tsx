@@ -8,16 +8,52 @@ import { Button } from "../ui/button";
 import { format_timestamp } from "@/utils/format_timestamp";
 import { use_thread_data_store } from "./use_thread_data";
 import { useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+
+const ModelSelector = () => {
+  const { id: thread_id } = useParams();
+  const thread_data_store = use_thread_data_store();
+
+  const on_value_change = async (model_id: string) => {
+    const thread = await workers_api_client.update_thread(thread_id!, { model_id });
+    console.log({ thread });
+    if (thread) {
+      thread_data_store.update_thread(thread);
+    }
+  };
+
+  return (
+    <Select
+      value={thread_data_store?.thread_data?.worker_config?.model_id}
+      onValueChange={(a) => on_value_change(a)}
+    >
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select a timezone" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>OpenAI</SelectLabel>
+          <SelectItem value="openai_gpt_4o">GPT-4o</SelectItem>
+          <SelectItem value="openai_gpt_4o_mini">GPT-4o mini</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+};
 
 export const ThreadLayout = () => {
   const { id: thread_id } = useParams();
 
-  const query = useQuery({
-    queryKey: ["thread", thread_id],
-    queryFn: () => workers_api_client.get_thread(thread_id),
-  });
-
   const thread_data_store = use_thread_data_store();
+  const { thread_data } = thread_data_store;
 
   const load_data = async () => {
     const new_thread_data = await workers_api_client.get_thread_data(thread_id);
@@ -35,31 +71,34 @@ export const ThreadLayout = () => {
 
   return (
     <div className="flex flex-col flex-1 overflow-y-auto border h-full">
-      <div className="flex p-2 gap-2 items-center">
-        <Link to="messages">
-          <Button variant="ghost" size="icon">
-            <MessagesSquare className="h-4 w-4" />
-          </Button>
-        </Link>
+      <div className="flex justify-between p-2">
+        <div className="flex gap-2 items-center">
+          <Link to="messages">
+            <Button variant="ghost" size="icon">
+              <MessagesSquare className="h-4 w-4" />
+            </Button>
+          </Link>
 
-        <Link to="tree">
-          <Button variant="ghost" size="icon">
-            <Network className="h-4 w-4" />
-          </Button>
-        </Link>
+          <Link to="tree">
+            <Button variant="ghost" size="icon">
+              <Network className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+        <ModelSelector />
       </div>
       <Separator />
 
       <div className="flex p-4">
         <div className="grid gap-1">
-          <span className="font-semibold">Thread: {query.data?.name}</span>
+          <span className="font-semibold">Thread: {thread_data?.name}</span>
           <div className="flex flex-row gap-2">
-            <span className="text-xs text-muted-foreground">{query.data?.id.slice(-6, -1)}</span>
-            <span className="text-xs">{query.data?.worker_id}</span>
+            <span className="text-xs text-muted-foreground">{thread_data?.id.slice(-6, -1)}</span>
+            <span className="text-xs">{thread_data?.worker_id}</span>
           </div>
         </div>
         <div className="ml-auto text-xs text-muted-foreground">
-          {format_timestamp(query.data?.created_at)}
+          {format_timestamp(thread_data?.created_at)}
         </div>
       </div>
       <Separator />

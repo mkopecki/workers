@@ -21,6 +21,12 @@ export const create_run: H = async (c) => {
     .where(eq(threads_table.id, data.thread_id));
   console.log(thread);
 
+  // permission check
+  const user_id = c.get("jwtPayload")["id"];
+  if (user_id !== thread.user_id) {
+    return c.json({ message: "Not found." }, 404);
+  }
+
   const thread_state: typeof thread_states_table.$inferInsert = {
     id: cuid(),
     created_at: new Date(),
@@ -37,6 +43,7 @@ export const create_run: H = async (c) => {
     thread_state_id: thread_state.id,
     thread_id: data.thread_id,
     worker_id: thread.worker_id,
+    model_id: thread.worker_config.model_id,
 
     status: "processing",
   };

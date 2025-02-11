@@ -3,11 +3,11 @@ import type { Worker } from ".";
 import { messages_table, run_steps_table } from "../db/schema";
 import type { Run } from "@src/types";
 import { get_message_history } from "@src/utils/get_message_history";
-import { openai_client } from "@src/models/openai_chat_model";
 import { thread_manager } from "@src/thread_manager";
+import { create_openai_client, type AvailableModels } from "@src/models/models";
 
 export type ChatWorkerConfig = {
-  model_id: string;
+  model_id: AvailableModels;
   stream?: boolean;
 };
 
@@ -27,12 +27,15 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
       content: m.content,
     }));
 
+    const { client, client_model } = create_openai_client(config.model_id);
+
     if (config?.stream ?? true) {
       const message: typeof messages_table.$inferInsert = {
         id: cuid(),
         created_at: new Date(),
         thread_id: run.thread_id,
         thread_state_id: run.thread_state_id,
+        author: config.model_id as string,
         role: "assistant",
         status: "generating",
         version: 0,
@@ -40,8 +43,8 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
       };
       await thread_manager.create_message(message);
 
-      const completion_stream = await openai_client.chat.completions.create({
-        model: "gpt-4o-mini",
+      const completion_stream = await client.chat.completions.create({
+        model: client_model,
         messages: openai_messages,
         stream: true,
       });
@@ -69,8 +72,8 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
         completion
       );
     } else {
-      const completion = await openai_client.chat.completions.create({
-        model: "gpt-4o-mini",
+      const completion = await client.chat.completions.create({
+        model: client_model,
         messages: openai_messages,
       });
 
@@ -84,6 +87,7 @@ export const basic_chat_worker: Worker<ChatWorkerConfig> = {
         created_at: new Date(),
         thread_id: run.thread_id,
         thread_state_id: run.thread_state_id,
+        author: config.model_id as string,
         role: "assistant",
         content,
         version: -1,
