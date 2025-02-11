@@ -7,6 +7,28 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+export const user_type = pgEnum("user_type", ["user", "guest"]);
+
+export const users_table = pgTable("user", {
+  id: text().primaryKey(),
+  created_at: timestamp().defaultNow().notNull(),
+
+  type: user_type().notNull(),
+
+  email: text(),
+  hashed_password: text(),
+
+  guest_id: text(),
+});
+
+export const sessions_table = pgTable("session", {
+  id: text().primaryKey(),
+  created_at: timestamp().defaultNow().notNull(),
+  user_id: text()
+    .references(() => users_table.id)
+    .notNull(),
+});
+
 export const threads_table = pgTable("thread", {
   id: text().primaryKey(),
   name: text().notNull(),
@@ -14,6 +36,10 @@ export const threads_table = pgTable("thread", {
 
   worker_id: text().notNull(),
   worker_config: json(),
+
+  user_id: text()
+    .references(() => users_table.id)
+    .notNull(),
 });
 
 export const thread_states_table = pgTable("thread_state", {
@@ -40,6 +66,7 @@ export const runs_table = pgTable("run", {
     .references(() => thread_states_table.id)
     .notNull(),
 
+  model_id: text().notNull(),
   worker_id: text().notNull(),
 
   status: run_status().notNull(),
@@ -56,7 +83,11 @@ export const run_steps_table = pgTable("run_step", {
   description: text().notNull(),
 });
 
-export const message_role = pgEnum("message_role", ["system", "assistant", "user"]);
+export const message_role = pgEnum("message_role", [
+  "system",
+  "assistant",
+  "user",
+]);
 export const message_status = pgEnum("message_status", ["generating", "done"]);
 export const messages_table = pgTable("message", {
   id: text().primaryKey(),
@@ -73,5 +104,6 @@ export const messages_table = pgTable("message", {
   status: message_status().notNull(),
 
   role: message_role().notNull(),
+  author: text().notNull(),
   content: text().notNull(),
 });

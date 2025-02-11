@@ -1,4 +1,4 @@
-import { create_openai_chat_model } from "./openai_chat_model";
+import OpenAI from "openai";
 import type { Message } from "@src/types";
 
 export type ChatModel = {
@@ -6,17 +6,32 @@ export type ChatModel = {
   create_completion: (messages: Message[]) => Promise<string>;
 };
 
-export const models = {
-  "openai_gpt_4o": create_openai_chat_model("gpt-4o"),
-  "openai_gpt_4o_mini": create_openai_chat_model("gpt-4o-mini"),
+export const models = ["openai_gpt_4o", "openai_gpt_4o_mini"] as const;
+export type AvailableModels = (typeof models)[number];
+
+type Client = {
+  client: OpenAI;
+  client_model: string;
 };
 
-export type AvailableModels = keyof typeof models;
+export const create_openai_client = (model: AvailableModels): Client => {
+  const openai_client = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
-export const get_model = (model_name: string) => {
-  if (!(model_name in models)) {
-    throw new Error("model is not available");
+  switch (model) {
+    case "openai_gpt_4o": {
+      return {
+        client: openai_client,
+        client_model: "gpt-4o",
+      };
+    }
+
+    case "openai_gpt_4o_mini": {
+      return {
+        client: openai_client,
+        client_model: "gpt-4o-mini",
+      };
+    }
   }
-
-  return models[model_name as AvailableModels];
 };

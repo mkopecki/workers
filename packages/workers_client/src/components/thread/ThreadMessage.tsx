@@ -32,7 +32,7 @@ export const ThreadMessage: React.FC<ThreadMessageProps> = ({
             is_self ? "justify-end text-end" : "justify-start text-start"
           )}
         >
-          <p className="text-xs text-muted-foreground">{format_timestamp(message.created_at)}</p>
+          <p className="text-xs text-muted-foreground">@{message.author} - {format_timestamp(message.created_at)}</p>
           <div className="prose prose-invert prose-headings:m-0">
             <Markdown
               remarkPlugins={[remarkMath, remarkGfm]}

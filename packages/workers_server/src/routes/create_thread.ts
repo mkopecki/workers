@@ -11,14 +11,16 @@ export type CreateThreadArgs = {
 
 export const create_thread: H = async (c) => {
   const data = await c.req.json<CreateThreadArgs>();
+  const user_id = c.get("jwtPayload")["id"];
 
-  // created thread
+  // create thread
   const thread: typeof threads_table.$inferInsert = {
     id: cuid(),
     created_at: new Date(),
     name: data.name,
     worker_id: data.worker_id,
     worker_config: data.worker_config,
+    user_id,
   };
   await db.insert(threads_table).values(thread);
   console.log(`created thread ${thread.id}`);
