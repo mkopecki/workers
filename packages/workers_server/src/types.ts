@@ -4,6 +4,7 @@ import type {
   runs_table,
   thread_states_table,
   threads_table,
+  users_table,
 } from "./db/schema";
 
 export type Run = typeof runs_table.$inferSelect;
@@ -11,6 +12,7 @@ export type RunStep = typeof run_steps_table.$inferSelect;
 export type Thread = typeof threads_table.$inferSelect;
 export type Message = typeof messages_table.$inferSelect;
 export type ThreadState = typeof thread_states_table.$inferSelect;
+export type User = typeof users_table.$inferSelect;
 
 export type ThreadStateCreatedEvent = {
   id: string;
@@ -77,3 +79,4 @@ export type ThreadData = Thread & {
     messages: Message[];
   })[];
 };
+

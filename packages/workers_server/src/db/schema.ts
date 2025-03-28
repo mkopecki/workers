@@ -18,7 +18,16 @@ export const users_table = pgTable("user", {
   email: text(),
   hashed_password: text(),
 
+  permissions: text().array(),
+
   guest_id: text(),
+});
+
+export const balance_transactions_table = pgTable("balance_transaction", {
+  id: text().primaryKey(),
+  created_at: timestamp().defaultNow().notNull(),
+  amount: integer(),
+  user_id: text().references(() => users_table.id),
 });
 
 export const sessions_table = pgTable("session", {

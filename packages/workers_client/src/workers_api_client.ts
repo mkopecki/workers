@@ -26,18 +26,25 @@ const get_threads = async (): Promise<Thread[] | null> => {
   }
 };
 
-const create_thread = async (data: CreateThreadArgs): Promise<void> => {
+const create_thread = async (
+  data: CreateThreadArgs,
+): Promise<{ thread: Thread; thread_state: ThreadState }> => {
   const url = build_server_url("/api/thread");
-  await fetch(url, {
+  const res = await fetch(url, {
     ...FETCH_SETTINGS,
     ...FETCH_POST_SETTINGS,
     body: JSON.stringify(data),
   });
+
+  if (res.status === 200) {
+    const thread = await res.json();
+    return thread;
+  }
 };
 
 const create_message = async (
   thread_id: string,
-  data: CreateMessageArgs
+  data: CreateMessageArgs,
 ): Promise<ThreadState | null> => {
   const url = build_server_url(`/api/thread/${thread_id}/message`);
   const res = await fetch(url, {
@@ -70,7 +77,9 @@ const create_run = async (data: CreateRunArgs): Promise<ThreadState | null> => {
   }
 };
 
-const get_thread_data = async (thread_id: string): Promise<ThreadData | null> => {
+const get_thread_data = async (
+  thread_id: string,
+): Promise<ThreadData | null> => {
   const url = build_server_url(`/api/thread/${thread_id}`);
   const res = await fetch(url, FETCH_SETTINGS);
 
@@ -82,7 +91,10 @@ const get_thread_data = async (thread_id: string): Promise<ThreadData | null> =>
   }
 };
 
-const update_thread = async (thread_id: string, data: ThreadUpdate): Promise<Thread | null> => {
+const update_thread = async (
+  thread_id: string,
+  data: ThreadUpdate,
+): Promise<Thread | null> => {
   const url = build_server_url(`/api/thread/${thread_id}`);
   const res = await fetch(url, {
     ...FETCH_SETTINGS,

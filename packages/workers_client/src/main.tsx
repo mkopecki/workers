@@ -11,6 +11,7 @@ import { ThreadLayout } from "./components/thread/ThreadLayout";
 import { ThreadChat } from "./components/thread/ThreadChat";
 import { ThreadTree } from "./components/thread/ThreadTree";
 import { UserAuth } from "./pages/UserAuth";
+import { NewThread } from "./components/thread/NewThread";
 
 const query_client = new QueryClient();
 
@@ -23,7 +24,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/signin" element={<UserAuth signup={false} />} />
 
           <Route element={<Layout />}>
-            <Route index element={<ThreadList />} />
+            <Route index element={<NewThread />} />
             <Route path="/thread/create" element={<ThreadCreationForm />} />
 
             <Route path="/thread/:id" element={<ThreadLayout />}>

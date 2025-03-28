@@ -1,6 +1,6 @@
 import { streamSSE } from "hono/streaming";
 import type { H } from "hono/types";
-import { thread_manager } from "@src/thread_manager";
+import { thread_manager } from "@src/threads/thread_manager";
 import { db } from "@src/db/db";
 import { threads_table } from "@src/db/schema";
 import { eq } from "drizzle-orm";

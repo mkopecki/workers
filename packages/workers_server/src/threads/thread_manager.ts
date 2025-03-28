@@ -1,11 +1,11 @@
 import cuid from "cuid";
-import { db } from "./db/db";
+import { db } from "../db/db";
 import {
   messages_table,
   run_steps_table,
   runs_table,
   thread_states_table,
-} from "./db/schema";
+} from "../db/schema";
 import type {
   Event,
   Message,
@@ -18,7 +18,7 @@ import type {
   RunStepCreatedEvent,
   ThreadState,
   ThreadStateCreatedEvent,
-} from "./types";
+} from "../types";
 import { eq } from "drizzle-orm";
 
 type EventListener = (event: Event) => void;

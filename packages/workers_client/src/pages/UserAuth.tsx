@@ -37,9 +37,14 @@ export const UserAuth: React.FC<Props> = ({ signup }) => {
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div className="border p-4 flex flex-col gap-2 justify-center">
-        <h1 className="text-xl text-center">{signup ? "Sign Up" : "Sign In"}</h1>
+        <h1 className="text-xl text-center">
+          {signup ? "Sign Up" : "Sign In"}
+        </h1>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(on_submit)} className="flex flex-col gap-2">
+          <form
+            onSubmit={form.handleSubmit(on_submit)}
+            className="flex flex-col gap-2"
+          >
             <FormField
               control={form.control}
               name="email"
@@ -47,7 +52,12 @@ export const UserAuth: React.FC<Props> = ({ signup }) => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input required type="email" placeholder="jane@acme.com" {...field} />
+                    <Input
+                      required
+                      type="email"
+                      placeholder="jane@acme.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -71,7 +81,9 @@ export const UserAuth: React.FC<Props> = ({ signup }) => {
             <Button type="submit">{signup ? "Sign Up" : "Sign In"}</Button>
           </form>
         </Form>
-        <Link to={signup ? "/signin" : "/signup"}><p className="text-xs text-center">Go to {signup ? "Sign In" : "Sign Up"}</p></Link> 
+        <Link to={signup ? "/signin" : "/signup"}>
+          <Button variant="link" className="text-xs text-center w-full">Go to {signup ? "Sign In" : "Sign Up"}</Button>
+        </Link>
       </div>
     </div>
   );

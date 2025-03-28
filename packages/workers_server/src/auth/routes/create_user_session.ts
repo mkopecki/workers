@@ -6,17 +6,17 @@ import { eq } from "drizzle-orm";
 import { compare } from "bcrypt";
 import { sign } from "hono/jwt";
 import { setCookie } from "hono/cookie";
-import type { JWTPayload } from "./create_guest_session";
+import type { JWTPayload } from "../jwt";
 
-const SignInUserArgs = z.object({
+const CreateUserSessionPayload = z.object({
   email: z.string(),
   password: z.string(),
 });
 
-export const signin_user: H = async c => {
+export const create_user_session: H = async c => {
   // validate data
-  const data = await c.req.json<z.infer<typeof SignInUserArgs>>();
-  SignInUserArgs.parse(data);
+  const data = await c.req.json<z.infer<typeof CreateUserSessionPayload>>();
+  CreateUserSessionPayload.parse(data);
   const { email, password } = data;
 
   // check if user already exists
@@ -36,15 +36,15 @@ export const signin_user: H = async c => {
     throw new Error("password does not match");
   }
 
-  // generate access tokeno
+  // generate access token
   const jwt_secret = process.env.JWT_SECRET as string;
   const jwt_payload: JWTPayload = {
     id: user.id,
-    exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24),
+    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
   };
   const token = await sign(jwt_payload, jwt_secret);
 
-  setCookie(c, "auth_token", token, {
+  setCookie(c, "workers_auth_token", token, {
     secure: true,
     httpOnly: true,
   });

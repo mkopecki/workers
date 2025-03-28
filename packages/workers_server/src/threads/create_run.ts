@@ -4,14 +4,17 @@ import cuid from "cuid";
 import { db } from "../db/db";
 import { eq } from "drizzle-orm";
 import { get_worker } from "../workers";
-import { thread_manager } from "@src/thread_manager";
+import { thread_manager } from "./thread_manager";
+import { balance } from "@src/balance";
 
 export type CreateRunArgs = {
   thread_id: string;
   current_thread_state_id: string;
 };
 
-export const create_run: H = async (c) => {
+const RUN_COST = 5;
+
+export const create_run: H = async c => {
   const data = await c.req.json<CreateRunArgs>();
 
   // get thread
@@ -26,6 +29,9 @@ export const create_run: H = async (c) => {
   if (user_id !== thread.user_id) {
     return c.json({ message: "Not found." }, 404);
   }
+
+  // balance check
+  await balance.verify(user_id, RUN_COST);
 
   const thread_state: typeof thread_states_table.$inferInsert = {
     id: cuid(),
@@ -59,6 +65,8 @@ export const create_run: H = async (c) => {
         status: "done",
       })
       .where(eq(runs_table.id, run.id));
+
+    await balance.modify(user_id, -RUN_COST);
 
     c.status(200);
     return c.json(thread_state);

@@ -3,8 +3,8 @@ import type { Worker } from ".";
 import { messages_table, run_steps_table } from "../db/schema";
 import type { Run } from "@src/types";
 import { get_message_history } from "@src/utils/get_message_history";
-import { thread_manager } from "@src/thread_manager";
 import { create_openai_client, type AvailableModels } from "@src/models/models";
+import { thread_manager } from "@src/threads/thread_manager";
 
 export type ChatWorkerConfig = {
   model_id: AvailableModels;
