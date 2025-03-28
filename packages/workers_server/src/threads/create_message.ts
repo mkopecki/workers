@@ -1,32 +1,23 @@
-import { thread_manager } from "@src/thread_manager";
-import {
-  messages_table,
-  thread_states_table,
-  threads_table,
-} from "../db/schema";
+import { messages_table, thread_states_table } from "../db/schema";
 import cuid from "cuid";
 import type { H } from "hono/types";
-import { db } from "@src/db/db";
-import { eq } from "drizzle-orm";
+import { auth } from "@src/auth/auth";
+import { thread_manager } from "./thread_manager";
 
-export type CreateMessageArgs = {
+export type CreateMessagePayload = {
   current_thread_state_id: string;
   content: string;
 };
 
 export const create_message: H = async c => {
   const thread_id = c.req.param("id");
-  const data = await c.req.json<CreateMessageArgs>();
+  const data = await c.req.json<CreateMessagePayload>();
+
+  const jwt_payload = c.get("jwtPayload");
+  const user_id = jwt_payload.id;
 
   // permission check
-  const [thread] = await db
-    .select()
-    .from(threads_table)
-    .where(eq(threads_table.id, thread_id));
-  const user_id = c.get("jwtPayload")["id"];
-  if (user_id !== thread.user_id) {
-    return c.json({ message: "Not found." }, 404);
-  }
+  auth.is_thread_owner(thread_id, jwt_payload);
 
   // create new thread state
   const thread_state: typeof thread_states_table.$inferInsert = {

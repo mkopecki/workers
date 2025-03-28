@@ -2,10 +2,10 @@ import { db } from "@src/db/db";
 import { users_table } from "@src/db/schema";
 import type { H } from "hono/types";
 import { eq } from "drizzle-orm";
+import { balance } from "@src/balance";
 
-export const me_user: H = async c => {
+export const get_user: H = async c => {
   const payload = c.get("jwtPayload");
-  console.log(payload);
 
   // retrieve user
   const { id } = payload;
@@ -14,13 +14,19 @@ export const me_user: H = async c => {
       id: users_table.id,
       type: users_table.type,
       email: users_table.email,
+      permissions: users_table.permissions,
     })
     .from(users_table)
     .where(eq(users_table.id, id));
+
+  const user_balance = await balance.get(id);
 
   if (!user) {
     return c.json({ message: "user not found" }, 404);
   }
 
-  return c.json(user);
+  return c.json({
+    ...user,
+    balance: user_balance,
+  });
 };

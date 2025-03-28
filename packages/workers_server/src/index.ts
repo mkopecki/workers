@@ -1,55 +1,31 @@
 import { Hono } from "hono";
-import { create_message } from "./routes/create_message";
+import { create_message } from "./threads/create_message";
 import { cors } from "hono/cors";
-import { get_threads } from "./routes/get_threads";
-import { create_thread } from "./routes/create_thread";
-import { create_run } from "./routes/create_run";
-import { get_thread_data } from "./routes/get_thread_data";
-import { get_thread_data_stream } from "./routes/get_thread_data_stream";
-import { verify } from "hono/jwt";
-import { create_guest_session } from "./routes/auth/create_guest_session";
-import { getCookie } from "hono/cookie";
-import { signup_user } from "./routes/auth/signup_user";
-import { signin_user } from "./routes/auth/signin_user";
-import { me_user } from "./routes/me_user";
-import { update_thread } from "./routes/update_thread";
+import { get_threads } from "./threads/get_threads";
+import { create_thread } from "./threads/create_thread";
+import { create_run } from "./threads/create_run";
+import { get_thread_data } from "./threads/get_thread_data";
+import { get_thread_data_stream } from "./threads/get_thread_data_stream";
+import { update_thread } from "./threads/update_thread";
+import { make_auth_guard } from "./auth/jwt";
+import { create_user } from "./auth/routes/create_user";
+import { create_guest_user } from "./auth/routes/create_guest_user";
+import { create_user_session } from "./auth/routes/create_user_session";
+import { get_user } from "./auth/routes/get_user";
 
 const app = new Hono();
 
 app.use(
   "/*",
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://client.localhost", "http://localhost:5173"],
     allowMethods: ["GET", "POST", "OPTIONS", "PATCH"],
     allowHeaders: ["Content-Type"],
     credentials: true,
   })
 );
 
-app.use("/api/*", async (_, next) => {
-  try {
-    const token = getCookie(_, "auth_token");
-    const jwt_secret = process.env.JWT_SECRET!;
-
-    if (!token) {
-      console.log("no token present");
-      return _.json({ message: "Unauthorized" }, 401);
-    }
-
-    const jwt_payload = await verify(token, jwt_secret);
-
-    if (!jwt_payload) {
-      console.log("token expired");
-      return _.json({ message: "token expired" }, 401);
-    }
-
-    _.set("jwtPayload", jwt_payload);
-    await next();
-  } catch (error) {
-    console.error(error);
-    return _.json({ message: "Unauthorized" }, 401);
-  }
-});
+app.use("/api/*", make_auth_guard());
 
 // app routes
 app.get("/api/thread", get_threads);
@@ -61,13 +37,12 @@ app.get("/api/thread/:id/stream", get_thread_data_stream);
 
 app.post("/api/thread/:id", update_thread);
 
-// user routes
-app.get("/api/me", me_user);
-
 // auth routes
-app.post("/auth/user/signup", signup_user);
-app.post("/auth/user/signin", signin_user);
-app.post("/auth/guest/session", create_guest_session);
+app.get("/api/user", get_user);
+app.post("/auth/user", create_user);
+app.post("/auth/user/guest", create_guest_user);
+app.post("/auth/user/session", create_user_session);
 
+app.get("/ping", c => c.text("pong"));
 
 export default app;

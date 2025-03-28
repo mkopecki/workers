@@ -1,2 +1,2 @@
-const HOST = "http://localhost:3000";
-export const build_server_url = (endpoint: string) => `${HOST}${endpoint}`;
+export const build_server_url = (endpoint: string) =>
+  `${__SERVER_HOST__}${endpoint}`;

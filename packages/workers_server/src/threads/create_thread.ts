@@ -9,7 +9,7 @@ export type CreateThreadArgs = {
   worker_config: any;
 };
 
-export const create_thread: H = async (c) => {
+export const create_thread: H = async c => {
   const data = await c.req.json<CreateThreadArgs>();
   const user_id = c.get("jwtPayload")["id"];
 
@@ -36,5 +36,5 @@ export const create_thread: H = async (c) => {
   console.log(`created thread_state ${thread_state.id}`);
 
   c.status(200);
-  return c.text("success");
+  return c.json({ thread, thread_state });
 };

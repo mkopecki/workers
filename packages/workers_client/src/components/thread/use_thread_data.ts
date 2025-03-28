@@ -1,3 +1,4 @@
+import { use_auth } from "@/auth/use_auth";
 import { workers_api_client } from "@/workers_api_client";
 import { useEffect } from "react";
 import {
@@ -21,9 +22,15 @@ type ThreadDataStore = {
 
   update_thread: (thread: Thread) => void;
 
-  consume_thread_state_created_event: (event_data: ThreadStateCreatedEvent["data"]) => void;
-  consume_message_created_event: (event_data: MessageCreatedEvent["data"]) => void;
-  consume_message_token_generated_event: (event_data: MessageTokenGeneratedEvent["data"]) => void;
+  consume_thread_state_created_event: (
+    event_data: ThreadStateCreatedEvent["data"],
+  ) => void;
+  consume_message_created_event: (
+    event_data: MessageCreatedEvent["data"],
+  ) => void;
+  consume_message_token_generated_event: (
+    event_data: MessageTokenGeneratedEvent["data"],
+  ) => void;
 };
 
 export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
@@ -49,19 +56,23 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
   },
 
   load_thread_state: (thread_state_id: string) => {
-    console.log(`thread_data_store: attempting to load thread_state with id ${thread_state_id}`);
+    console.log(
+      `thread_data_store: attempting to load thread_state with id ${thread_state_id}`,
+    );
     const thread_data = get().thread_data;
     if (!thread_data) {
       console.error(
-        "thread_data_store: can't load thread_state. thread_data has not been loaded yet."
+        "thread_data_store: can't load thread_state. thread_data has not been loaded yet.",
       );
       return;
     }
 
-    const thread_state = thread_data.thread_states.find((s) => s.id === thread_state_id);
+    const thread_state = thread_data.thread_states.find(
+      (s) => s.id === thread_state_id,
+    );
     if (!thread_state) {
       console.error(
-        "thread_data_store: can't load thread_state. thread_id with given id could not be found."
+        "thread_data_store: can't load thread_state. thread_id with given id could not be found.",
       );
       return;
     }
@@ -76,7 +87,7 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
 
       if (current_thread_state.previous_thread_state_id) {
         const previous_thread_state = thread_data.thread_states.find(
-          (s) => s.id === current_thread_state.previous_thread_state_id
+          (s) => s.id === current_thread_state.previous_thread_state_id,
         );
 
         current_thread_state = previous_thread_state ?? null;
@@ -86,10 +97,11 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
     }
 
     thread_state_history.sort(
-      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      (a, b) =>
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
     );
     console.log(
-      `thread_data_store: built thread_state_history for thread_state ${thread_state_id}`
+      `thread_data_store: built thread_state_history for thread_state ${thread_state_id}`,
     );
 
     set((state) => ({
@@ -97,14 +109,18 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
       thread_state,
       thread_state_history,
     }));
-    console.log(`thread_data_store: successfully loaded thread_state ${thread_state_id}`);
+    console.log(
+      `thread_data_store: successfully loaded thread_state ${thread_state_id}`,
+    );
     console.log({ thread_state_history: get().thread_state_history });
   },
 
-  consume_thread_state_created_event: (event_data: ThreadStateCreatedEvent["data"]) => {
+  consume_thread_state_created_event: (
+    event_data: ThreadStateCreatedEvent["data"],
+  ) => {
     const { thread_state } = event_data;
     console.log(
-      `thread_data_store: consuming thread_state_created_event for thread_state ${thread_state.id}`
+      `thread_data_store: consuming thread_state_created_event for thread_state ${thread_state.id}`,
     );
 
     set((state) => ({
@@ -121,7 +137,9 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
         ],
       },
     }));
-    console.log(`thread_data_store: added new thread_state ${thread_state.id} to thread_data`);
+    console.log(
+      `thread_data_store: added new thread_state ${thread_state.id} to thread_data`,
+    );
     console.log(get().thread_data);
 
     get().load_thread_state(thread_state.id);
@@ -129,7 +147,9 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
 
   consume_message_created_event: (event_data: MessageCreatedEvent["data"]) => {
     const { message } = event_data;
-    console.log(`thread_data_store: consuming message_created_event for message ${message.id}`);
+    console.log(
+      `thread_data_store: consuming message_created_event for message ${message.id}`,
+    );
 
     set((state) => ({
       ...state,
@@ -147,16 +167,20 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
         }),
       },
     }));
-    console.log(`thread_data_store: added new message ${message.id} to thread_data`);
+    console.log(
+      `thread_data_store: added new message ${message.id} to thread_data`,
+    );
     console.log(get().thread_data);
 
     get().load_thread_state(message.thread_state_id);
   },
 
-  consume_message_token_generated_event: (event_data: MessageTokenGeneratedEvent["data"]) => {
+  consume_message_token_generated_event: (
+    event_data: MessageTokenGeneratedEvent["data"],
+  ) => {
     const { message_id, token, version, thread_state_id } = event_data;
     console.log(
-      `thread_data_store: consuming message_token_generated_event for message ${message_id}`
+      `thread_data_store: consuming message_token_generated_event for message ${message_id}`,
     );
 
     set((state) => ({
@@ -190,7 +214,7 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
       },
     }));
     console.log(
-      `thread_data_store: added new message token for message ${message_id} to thread_data`
+      `thread_data_store: added new message token for message ${message_id} to thread_data`,
     );
     get().load_thread_state(thread_state_id);
     console.log({ thread_data: get().thread_data });
@@ -216,12 +240,17 @@ export const use_thread_data = (thread_id: string) => {
 
   useEffect(() => {
     console.log("creating event source");
-    const event_source = new EventSource(`http://localhost:3000/api/thread/${thread_id}/stream`, {
-      withCredentials: true,
-    });
+    const event_source = new EventSource(
+      `api/thread/${thread_id}/stream`,
+      {
+        withCredentials: true,
+      },
+    );
 
     event_source.addEventListener("thread_state_created", (event) => {
-      const event_data = JSON.parse(event.data) as ThreadStateCreatedEvent["data"];
+      const event_data = JSON.parse(
+        event.data,
+      ) as ThreadStateCreatedEvent["data"];
       console.log({ event_data });
       thread_data_store.consume_thread_state_created_event(event_data);
     });
@@ -234,7 +263,9 @@ export const use_thread_data = (thread_id: string) => {
       console.log({ event_data });
     });
     event_source.addEventListener("message_token_generated", (event) => {
-      const event_data = JSON.parse(event.data) as MessageTokenGeneratedEvent["data"];
+      const event_data = JSON.parse(
+        event.data,
+      ) as MessageTokenGeneratedEvent["data"];
       console.log({ event_data });
       thread_data_store.consume_message_token_generated_event(event_data);
     });
@@ -250,6 +281,7 @@ export const use_thread_data = (thread_id: string) => {
     };
   }, [thread_id]);
 
+  const { reload } = use_auth();
   const create_message = async (content: string) => {
     const current_thread_state_id = thread_data_store.thread_state?.id;
     if (!current_thread_state_id) {
@@ -258,15 +290,20 @@ export const use_thread_data = (thread_id: string) => {
     }
 
     // reload data
-    const message_thread_state = await workers_api_client.create_message(thread_id, {
-      content,
-      current_thread_state_id,
-    });
+    const message_thread_state = await workers_api_client.create_message(
+      thread_id,
+      {
+        content,
+        current_thread_state_id,
+      },
+    );
 
     const run_thread_state = await workers_api_client.create_run({
       thread_id,
       current_thread_state_id: message_thread_state.id,
     });
+
+    reload();
 
     // await load_data(false);
     // thread_data_store.load_thread_state(run_thread_state.id);

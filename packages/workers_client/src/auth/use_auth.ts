@@ -22,7 +22,7 @@ export const use_auth = () => {
   const auth_store = use_auth_store();
 
   useEffect(() => {
-    const url = build_server_url("/api/me");
+    const url = build_server_url("/api/user");
     fetch(url, {
       credentials: "include",
     })
@@ -31,7 +31,7 @@ export const use_auth = () => {
           const data = await res.json();
           auth_store.set_user(data);
         } else {
-          const url = build_server_url("/auth/guest/session");
+          const url = build_server_url("/auth/user/guest");
           await fetch(url, {
             method: "POST",
             headers: {
@@ -52,7 +52,7 @@ export const use_auth = () => {
       password,
     };
 
-    const url = build_server_url("/auth/user/signin");
+    const url = build_server_url("/auth/user/session");
     const user = await fetch(url, {
       method: "POST",
       headers: {
@@ -69,7 +69,7 @@ export const use_auth = () => {
       password,
     };
 
-    const url = build_server_url("/auth/user/signup");
+    const url = build_server_url("/auth/user");
     const user = await fetch(url, {
       method: "POST",
       headers: {
@@ -81,8 +81,24 @@ export const use_auth = () => {
     console.log(user);
   };
 
+  const reload = () => {
+    const url = build_server_url("/api/user");
+    fetch(url, {
+      credentials: "include",
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        auth_store.set_user(data);
+      })
+      .catch(async (error) => {
+        console.error(error);
+      });
+  };
+
   return {
     user: auth_store.user,
+    reload,
+
     signin_user,
     signup_user,
   };

@@ -4,20 +4,27 @@ import cuid from "cuid";
 import { setCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 import type { H } from "hono/types";
+import type { JWTPayload } from "../jwt";
+import { permissions } from "../permissions";
+import { balance } from "@src/balance";
 
-export type JWTPayload = {
-  id: string;
-  exp: number;
-}
+const GUEST_DEFAULT_PERMISSIONS = [
+  permissions.can_access_model("openai_gpt_4o_mini"),
+];
 
-export const create_guest_session: H = async c => {
+const DEFAULT_GUEST_BALANCE = 10;
+
+export const create_guest_user: H = async c => {
   // create session in the database
   const user: typeof users_table.$inferInsert = {
     id: cuid(),
     type: "guest",
     guest_id: cuid(),
+    permissions: permissions.get_ids(GUEST_DEFAULT_PERMISSIONS),
   };
   await db.insert(users_table).values(user);
+
+  await balance.modify(user.id, DEFAULT_GUEST_BALANCE);
 
   // create user in the databas
   const session: typeof sessions_table.$inferInsert = {
@@ -34,7 +41,7 @@ export const create_guest_session: H = async c => {
   };
   const token = await sign(jwt_payload, jwt_secret);
 
-  setCookie(c, "auth_token", token, {
+  setCookie(c, "workers_auth_token", token, {
     secure: true,
     httpOnly: true,
   });

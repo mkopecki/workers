@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { workers_api_client } from "@/workers_api_client";
 import { useQuery } from "@tanstack/react-query";
-import { Cog, MessagesSquare, Network, Star } from "lucide-react";
+import { Cog, Lock, MessagesSquare, Network, Star } from "lucide-react";
 import { Link, Outlet, useParams } from "react-router";
 import { Button } from "../ui/button";
 import { format_timestamp } from "@/utils/format_timestamp";
@@ -17,13 +17,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { use_auth } from "@/auth/use_auth";
+
+type ModelSelectItemProps = {
+  model_id: string;
+  model_name: string;
+};
+export const ModelSelectItem: React.FC<ModelSelectItemProps> = ({
+  model_id,
+  model_name,
+}) => {
+  const { user } = use_auth();
+
+  if (user?.permissions?.includes(`can_access_${model_id}`)) {
+    return <SelectItem value={model_id}>{model_name}</SelectItem>;
+  } else {
+    return (
+      <SelectItem value={model_id} disabled>
+        {model_name}
+      </SelectItem>
+    );
+  }
+};
 
 const ModelSelector = () => {
   const { id: thread_id } = useParams();
   const thread_data_store = use_thread_data_store();
 
   const on_value_change = async (model_id: string) => {
-    const thread = await workers_api_client.update_thread(thread_id!, { model_id });
+    const thread = await workers_api_client.update_thread(thread_id!, {
+      model_id,
+    });
     console.log({ thread });
     if (thread) {
       thread_data_store.update_thread(thread);
@@ -41,8 +65,11 @@ const ModelSelector = () => {
       <SelectContent>
         <SelectGroup>
           <SelectLabel>OpenAI</SelectLabel>
-          <SelectItem value="openai_gpt_4o">GPT-4o</SelectItem>
-          <SelectItem value="openai_gpt_4o_mini">GPT-4o mini</SelectItem>
+          <ModelSelectItem
+            model_id="openai_gpt_4o_mini"
+            model_name="GPT-4o-mini"
+          />
+          <ModelSelectItem model_id="openai_gpt_4o" model_name="GPT-4o" />
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -93,7 +120,9 @@ export const ThreadLayout = () => {
         <div className="grid gap-1">
           <span className="font-semibold">Thread: {thread_data?.name}</span>
           <div className="flex flex-row gap-2">
-            <span className="text-xs text-muted-foreground">{thread_data?.id.slice(-6, -1)}</span>
+            <span className="text-xs text-muted-foreground">
+              {thread_data?.id.slice(-6, -1)}
+            </span>
             <span className="text-xs">{thread_data?.worker_id}</span>
           </div>
         </div>
