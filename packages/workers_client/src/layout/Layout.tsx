@@ -5,14 +5,13 @@ import { MessagesSquare, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { workers_api_client } from "@/workers_api_client";
 import { Separator } from "@/components/ui/separator";
-import { use_thread_data_store } from "@/components/thread/use_thread_data";
 import { format_timestamp } from "@/utils/format_timestamp";
-import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
-import { use_auth } from "@/auth/use_auth";
-import { use_auth_guard } from "@/auth/AuthGuard";
+import { use_auth_guard } from "@/auth/use_auth_guard";
+import { use_auth_store } from "@/auth/auth";
 
 export const Layout = () => {
+  use_auth_guard();
+
   return (
     <div className="h-screen w-full flex justify-center p-4 pt-0 overflow-y-auto">
       <Navbar />
@@ -29,8 +28,7 @@ const Navbar = () => {
     queryFn: workers_api_client.get_threads,
   });
 
-  const { user } = use_auth();
-  use_auth_guard();
+  const auth_store = use_auth_store();
 
   return (
     <div className="w-48 border-l flex flex-col">
@@ -84,19 +82,19 @@ const Navbar = () => {
 
       <Separator />
       <div className="flex flex-col p-2 gap-2">
-        {user?.type === "guest" && (
+        {auth_store?.user?.type === "guest" && (
           <Link to="/signin">
             <Button className="w-full">Sign In</Button>
           </Link>
         )}
         <div className="flex flex-col text-xs px-4">
-        <span className="text-muted-foreground">User</span>
-        <span>
-          {user?.type === "guest"
-            ? `Guest #${user?.id.slice(-6)}`
-            : user?.email}
-        </span>
-        <span>Balance: {user?.balance} Credits</span>
+          <span className="text-muted-foreground">User</span>
+          <span>
+            {auth_store?.user?.type === "guest"
+              ? `Guest #${auth_store?.user?.id.slice(-6)}`
+              : auth_store?.user?.email}
+          </span>
+          <span>Balance: {auth_store?.user?.balance} Credits</span>
         </div>
       </div>
     </div>
