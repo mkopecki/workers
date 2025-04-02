@@ -8,6 +8,10 @@ RUN bun install
 COPY . .
 
 WORKDIR /app/packages/workers_client
+RUN bun run build_unsafe
 
-EXPOSE 80
-CMD ["bun", "run", "dev"]
+FROM nginx:stable-alpine
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder /app/packages/workers_client/dist /usr/share/nginx/html
+EXPOSE 3000
+CMD ["nginx", "-g", "daemon off;"]
