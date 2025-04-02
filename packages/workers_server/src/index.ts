@@ -18,7 +18,11 @@ const app = new Hono();
 app.use(
   "/*",
   cors({
-    origin: ["http://client.localhost", "http://localhost:5173"],
+    origin: [
+      "http://client.localhost",
+      "http://localhost:5173",
+      `https://${process.env.CLIENT_HOST}`,
+    ],
     allowMethods: ["GET", "POST", "OPTIONS", "PATCH"],
     allowHeaders: ["Content-Type"],
     credentials: true,
@@ -40,7 +44,7 @@ app.post("/api/thread/:id", update_thread);
 // auth routes
 app.get("/api/user", get_user);
 app.post("/auth/user", create_user);
-app.post("/auth/user/guest", create_guest_user);
+// app.post("/auth/user/guest", create_guest_user);
 app.post("/auth/user/session", create_user_session);
 
 app.get("/ping", c => c.text("pong"));

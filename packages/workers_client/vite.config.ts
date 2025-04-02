@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        "micromark-extension-math": "micromark-extension-llm-math",
       },
     },
     define: {
