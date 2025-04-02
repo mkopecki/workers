@@ -1,5 +1,5 @@
 import { build_server_url } from "@/api";
-import { use_auth_store } from "@/auth/auth";
+import { get_user_data, use_auth_store } from "@/auth/auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,9 +32,11 @@ export const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (auth_store.user) {
-      navigate("/");
-    }
+    get_user_data(auth_store).then((user) => {
+      if (user) {
+        navigate("/");
+      }
+    });
   }, []);
 
   const on_submit: SubmitHandler<LoginForm> = async (data: LoginForm) => {

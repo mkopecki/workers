@@ -1,8 +1,6 @@
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { workers_api_client } from "@/workers_api_client";
-import { useQuery } from "@tanstack/react-query";
-import { Cog, Lock, MessagesSquare, Network, Star } from "lucide-react";
+import { MessagesSquare, Network } from "lucide-react";
 import { Link, Outlet, useParams } from "react-router";
 import { Button } from "../ui/button";
 import { format_timestamp } from "@/utils/format_timestamp";
@@ -17,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { use_auth } from "@/auth/use_auth";
+import { use_auth_store } from "@/auth/auth";
 
 type ModelSelectItemProps = {
   model_id: string;
@@ -27,7 +25,7 @@ export const ModelSelectItem: React.FC<ModelSelectItemProps> = ({
   model_id,
   model_name,
 }) => {
-  const { user } = use_auth();
+  const { user } = use_auth_store();
 
   if (user?.permissions?.includes(`can_access_${model_id}`)) {
     return <SelectItem value={model_id}>{model_name}</SelectItem>;

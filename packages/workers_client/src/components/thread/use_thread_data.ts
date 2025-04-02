@@ -1,5 +1,4 @@
 import { build_server_url } from "@/api";
-import { use_auth } from "@/auth/use_auth";
 import { workers_api_client } from "@/workers_api_client";
 import { useEffect } from "react";
 import {
@@ -282,7 +281,6 @@ export const use_thread_data = (thread_id: string) => {
     };
   }, [thread_id]);
 
-  const { reload } = use_auth();
   const create_message = async (content: string) => {
     const current_thread_state_id = thread_data_store.thread_state?.id;
     if (!current_thread_state_id) {
@@ -304,7 +302,7 @@ export const use_thread_data = (thread_id: string) => {
       current_thread_state_id: message_thread_state.id,
     });
 
-    reload();
+    // reload();
 
     // await load_data(false);
     // thread_data_store.load_thread_state(run_thread_state.id);
