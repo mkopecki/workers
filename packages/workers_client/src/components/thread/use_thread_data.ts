@@ -1,3 +1,4 @@
+import { build_server_url } from "@/api";
 import { use_auth } from "@/auth/use_auth";
 import { workers_api_client } from "@/workers_api_client";
 import { useEffect } from "react";
@@ -240,12 +241,12 @@ export const use_thread_data = (thread_id: string) => {
 
   useEffect(() => {
     console.log("creating event source");
-    const event_source = new EventSource(
-      `api/thread/${thread_id}/stream`,
-      {
-        withCredentials: true,
-      },
-    );
+    const server_url = build_server_url(`/api/thread/${thread_id}/stream`);
+    console.log(server_url);
+
+    const event_source = new EventSource(server_url, {
+      withCredentials: true,
+    });
 
     event_source.addEventListener("thread_state_created", (event) => {
       const event_data = JSON.parse(

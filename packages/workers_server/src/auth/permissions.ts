@@ -6,6 +6,10 @@ const is_registered: Permission = {
   id: "is_registered",
 };
 
+const no_balance: Permission = {
+  id: "no_balance",
+};
+
 const can_access_model = (model_id: string): Permission => ({
   id: `can_access_${model_id}`,
 });
@@ -18,4 +22,6 @@ export const permissions = {
 
   is_registered,
   can_access_model,
+
+  no_balance,
 };
