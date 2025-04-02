@@ -3,7 +3,6 @@ import { db } from "./db/db";
 import { balance_transactions_table, users_table } from "./db/schema";
 import cuid from "cuid";
 import type { User } from "./types";
-import { permissions } from "./auth/permissions";
 
 const get = async (user_id: string): Promise<number> => {
   const [{ balance }] = await db
@@ -25,10 +24,6 @@ const get_user = async (user_id: string): Promise<User> => {
 const verify = async (user_id: string, charge: number) => {
   const balance = await get(user_id);
   const user = await get_user(user_id);
-
-  if (user?.permissions?.includes(permissions.no_balance.id)) {
-    return true;
-  }
 
   if (balance < charge) {
     throw new Error(`insufficient balance for user ${user_id}`);

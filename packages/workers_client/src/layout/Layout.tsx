@@ -10,6 +10,7 @@ import { format_timestamp } from "@/utils/format_timestamp";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef } from "react";
 import { use_auth } from "@/auth/use_auth";
+import { use_auth_guard } from "@/auth/AuthGuard";
 
 export const Layout = () => {
   return (
@@ -29,6 +30,7 @@ const Navbar = () => {
   });
 
   const { user } = use_auth();
+  use_auth_guard();
 
   return (
     <div className="w-48 border-l flex flex-col">
