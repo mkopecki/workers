@@ -95,8 +95,8 @@ export const ThreadLayout = () => {
   }, [thread_id]);
 
   return (
-    <div className="flex flex-col flex-1 overflow-y-auto border h-full">
-      <div className="flex justify-between p-2">
+    <div className="flex flex-col flex-1 overflow-y-auto h-full">
+      <div className="flex justify-between p-2 h-12">
         <div className="flex gap-2 items-center">
           <Link to="messages">
             <Button variant="ghost" size="icon">

@@ -12,6 +12,7 @@ import { ThreadTree } from "./components/thread/ThreadTree";
 import { NewThread } from "./components/thread/NewThread";
 import { Login } from "./routes/Login";
 import { Signup } from "./routes/Signup";
+import { LayoutResizable } from "./layout/LayoutResizable";
 
 const query_client = new QueryClient();
 
@@ -23,7 +24,7 @@ createRoot(document.getElementById("root")!).render(
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          <Route element={<Layout />}>
+          <Route element={<LayoutResizable />}>
             <Route index element={<NewThread />} />
             <Route path="/thread/create" element={<ThreadCreationForm />} />
 
