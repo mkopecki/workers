@@ -12,6 +12,7 @@ import { ThreadChat } from "./components/thread/ThreadChat";
 import { ThreadTree } from "./components/thread/ThreadTree";
 import { UserAuth } from "./pages/UserAuth";
 import { NewThread } from "./components/thread/NewThread";
+import { Login } from "./routes/Login";
 
 const query_client = new QueryClient();
 
@@ -20,6 +21,8 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={query_client}>
       <BrowserRouter>
         <Routes>
+        <Route path="/login" element={<Login />} />
+
           <Route path="/signup" element={<UserAuth signup={true} />} />
           <Route path="/signin" element={<UserAuth signup={false} />} />
 
