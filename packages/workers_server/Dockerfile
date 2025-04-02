@@ -2,7 +2,7 @@ FROM oven/bun:latest AS builder
 WORKDIR /app
 
 # Copy root-level files needed for dependency resolution
-COPY package.json bun.lockb ./
+COPY package.json ./
 
 # Bring in the workspace
 COPY packages packages
