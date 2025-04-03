@@ -1,6 +1,6 @@
 .env.*
 
-# lentsencrypt
+letsencrypt
 
 bun.lockb
 pg_data
