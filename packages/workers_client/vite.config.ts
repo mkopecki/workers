@@ -16,5 +16,10 @@ export default defineConfig(({ mode }) => {
     define: {
       __SERVER_HOST__: JSON.stringify(env.VITE_SERVER_HOST),
     },
+    preview: {
+      host: true,
+      allowedHosts: ".sophia.sh",
+      port: 3000,
+    },
   };
 });
