@@ -20,9 +20,11 @@ services:
     restart: always
     labels:
       - "traefik.http.routers.server.rule=Host(`${SERVER_HOST}`)"
-      - "traefik.http.routers.server.entrypoints=websecure"
-      - "traefik.http.routers.server.tls.certresolver=myresolver"
+      - "traefik.http.routers.server.entrypoints=web"
+      # - "traefik.http.routers.server.entrypoints=websecure"
+      # - "traefik.http.routers.server.tls.certresolver=myresolver"
     environment:
+      NODE_ENV: PRODUCTION
       DB_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/workers
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       JWT_SECRET: ${JWT_SECRET}
@@ -36,26 +38,28 @@ services:
     restart: always
     labels:
       - "traefik.http.routers.client.rule=Host(`${CLIENT_HOST}`)"
-      - "traefik.http.routers.client.entrypoints=websecure"
-      - "traefik.http.routers.client.tls.certresolver=myresolver"
+      - "traefik.http.routers.client.entrypoints=web"
+      - "traefik.http.services.client.loadbalancer.server.port=3000"
+      # - "traefik.http.routers.client.entrypoints=websecure"
+      # - "traefik.http.routers.client.tls.certresolver=myresolver"
     environment:
-      VITE_SERVER_HOST: "https://${SERVER_HOST}"
+      NODE_ENV: PRODUCTION
+      VITE_SERVER_HOST: ${VITE_SERVER_HOST}
 
   traefik:
     image: traefik:latest
     command:
       - "--api=true"
-      - "--api.insecure=false"
+      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=maxim@mkopecki.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-
+      # - "--entrypoints.websecure.address=:443"
+      # - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # - "--certificatesresolvers.myresolver.acme.email=maxim@mkopecki.com"
+      # - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
-      - "443:443"
+      # - "443:443"
       - "8080:8080"
     volumes:
       - ./letsencrypt:/letsencrypt
