@@ -9,5 +9,5 @@ COPY . .
 
 WORKDIR /app/packages/workers_client
 
-EXPOSE 4173
-CMD ["bun", "run", "preview"]
+EXPOSE 3000
+CMD ["bun", "run", "preview", "--host"]
