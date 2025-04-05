@@ -64,8 +64,8 @@ export const Signup = () => {
       <div className="flex flex-col gap-6">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-xl">Welcome back</CardTitle>
-            <CardDescription>Login with your account</CardDescription>
+            <CardTitle className="text-xl">Sign Up</CardTitle>
+            <CardDescription>Create your account</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -102,6 +102,7 @@ export const Signup = () => {
                               required
                               type="password"
                               placeholder=""
+                              defaultValue=""
                               {...field}
                             />
                           </FormControl>
@@ -111,13 +112,13 @@ export const Signup = () => {
                     />
 
                     <Button type="submit" className="w-full">
-                      Login
+                      Sign Up
                     </Button>
                   </div>
                   <div className="text-center text-sm">
-                    Don&apos;t have an account?{" "}
-                    <Link to="/signup" className="underline underline-offset-4">
-                      Sign up
+                    Already have an account?{" "}
+                    <Link to="/login" className="underline underline-offset-4">
+                      Log in
                     </Link>
                   </div>
                 </div>

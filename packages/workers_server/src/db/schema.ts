@@ -15,6 +15,8 @@ export const users_table = pgTable("user", {
 
   type: user_type().notNull(),
 
+  image_url: text(),
+  username: text(),
   email: text(),
   hashed_password: text(),
 
@@ -42,6 +44,7 @@ export const threads_table = pgTable("thread", {
   id: text().primaryKey(),
   name: text().notNull(),
   created_at: timestamp().defaultNow().notNull(),
+  updated_at: timestamp().defaultNow().notNull(),
 
   worker_id: text().notNull(),
   worker_config: json(),

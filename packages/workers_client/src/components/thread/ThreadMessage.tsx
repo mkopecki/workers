@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import type { RunStep, Message} from "workers_server/src/types";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import type { RunStep, Message } from "workers_server/src/types";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Markdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -9,19 +9,36 @@ import remarkGfm from "remark-gfm";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { format_timestamp } from "@/utils/format_timestamp";
+import { use_auth_store } from "@/auth/auth";
 
 type ThreadMessageProps = {
-  message: Message
+  message: Message;
 };
-export const ThreadMessage: React.FC<ThreadMessageProps> = ({
-  message,
-}) => {
+export const ThreadMessage: React.FC<ThreadMessageProps> = ({ message }) => {
+  const { user } = use_auth_store();
+
   const is_self = message.role === "user";
+  const author = is_self ? user?.username : message.author;
   return (
-    <div className={cn("flex", "w-full", is_self ? "justify-end" : "justify-start")}>
-      <div className={cn("flex", "gap-4", is_self ? "flex-row-reverse" : "flex-row")}>
+    <div
+      className={cn(
+        "flex",
+        "w-full",
+        is_self ? "justify-end" : "justify-start",
+      )}
+    >
+      <div
+        className={cn(
+          "flex",
+          "gap-4",
+          is_self ? "flex-row-reverse" : "flex-row",
+        )}
+      >
         <Avatar>
-          <AvatarFallback className={cn(is_self ? "bg-slate-900" : "bg-blue-400")}>
+          <AvatarImage src={user?.image_url} alt={user?.username} />
+          <AvatarFallback
+            className={cn(is_self ? "bg-slate-900" : "bg-blue-400")}
+          >
             {is_self ? "U" : "W"}
           </AvatarFallback>
         </Avatar>
@@ -29,10 +46,12 @@ export const ThreadMessage: React.FC<ThreadMessageProps> = ({
           className={cn(
             "flex",
             "flex-col",
-            is_self ? "justify-end text-end" : "justify-start text-start"
+            is_self ? "justify-end text-end" : "justify-start text-start",
           )}
         >
-          <p className="text-xs text-muted-foreground">@{message.author} - {format_timestamp(message.created_at)}</p>
+          <p className="text-xs text-muted-foreground">
+            @{author} - {format_timestamp(message.created_at)}
+          </p>
           <div className="prose prose-invert prose-headings:m-0">
             <Markdown
               remarkPlugins={[remarkMath, remarkGfm]}

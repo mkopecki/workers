@@ -2,7 +2,7 @@ import { db } from "@src/db/db";
 import { users_table } from "@src/db/schema";
 import type { H } from "hono/types";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import cuid from "cuid";
 import { genSalt, hash } from "bcrypt";
 import { permissions, Permission } from "../permissions";
@@ -12,6 +12,7 @@ import { setCookie } from "hono/cookie";
 import { balance } from "@src/balance";
 
 const CreateUserPayload = z.object({
+  username: z.string(),
   email: z.string(),
   password: z.string(),
 });
@@ -28,13 +29,15 @@ export const create_user: H = async c => {
   // validate data
   const data = await c.req.json<z.infer<typeof CreateUserPayload>>();
   CreateUserPayload.parse(data);
-  const { email, password } = data;
+  const { email, password, username } = data;
 
   // check if user already exists
   const existing_users = await db
     .select()
     .from(users_table)
-    .where(eq(users_table.email, email));
+    .where(
+      or(eq(users_table.email, email), eq(users_table.username, username))
+    );
 
   if (existing_users.length !== 0) {
     throw new Error("user already exists");
@@ -47,6 +50,7 @@ export const create_user: H = async c => {
   const user: typeof users_table.$inferInsert = {
     id: cuid(),
     type: "user",
+    username,
     email,
     hashed_password,
     permissions: permissions.get_ids(DEFAULT_USER_PERMISSIONS),
