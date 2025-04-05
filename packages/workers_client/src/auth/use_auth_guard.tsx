@@ -7,7 +7,6 @@ export const use_auth_guard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("running AuthGuard");
     if (auth_store.user) {
       return;
     }

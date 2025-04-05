@@ -56,7 +56,7 @@ export const NewThread: React.FC = () => {
       current_thread_state_id: message_thread_state.id,
     });
 
-    await navigate(`/thread/${thread.id}/messages`);
+    await navigate(`/threads/${thread.id}/messages`);
   };
 
   return (

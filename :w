@@ -1,22 +1,24 @@
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { MessagesSquare } from "lucide-react";
+import { MessagesSquare, Terminal, TerminalSquare } from "lucide-react";
 import { Link, NavLink, Outlet } from "react-router";
 import logo from "@/assets/logo.svg";
 import { Separator } from "@/components/ui/separator";
 import { workers_api_client } from "@/workers_api_client";
 import { useQuery } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Thread } from "workers_server/src/types";
 import { format_timestamp } from "@/utils/format_timestamp";
+import { use_auth_guard } from "@/auth/use_auth_guard";
 
-export const LayoutResizable = () => {
+export const Layout = () => {
+  use_auth_guard();
+
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel defaultSize={15} maxSize={20} minSize={15}>
@@ -96,25 +98,38 @@ const ThreadCard = ({ thread }: { thread: Thread }) => {
 
 const Nav = () => {
   return (
-    <div className="group flex flex-col gap-4 py-2">
-      <nav className="grid gap-1 px-2">
-        <div className="px-4">
-          <Link to="/">
-            <div className="flex flex-row gap-2 justify-start h-9 items-center">
-              <img src={logo} className="h-4 w-4" />
-              <h1 className="font-semibold text-lg">Sophia</h1>
-            </div>
-          </Link>
-        </div>
-        <Separator />
-
+    <nav className="flex flex-col gap-4 bg-sidebar h-full px-2">
+      <div className="px-4 h-12 py-2 flex items-center">
         <Link to="/">
-          <Button variant="ghost" className="w-full justify-start text-sm">
-            <MessagesSquare className="mr-2 h-4 w-4" />
-            Threads
-          </Button>
+          <div className="flex flex-row gap-2 justify-start items-center">
+            <img src={logo} className="h-4 w-4" />
+            <h1 className="font-semibold text-lg">Sophia</h1>
+          </div>
         </Link>
-      </nav>
-    </div>
+      </div>
+      <Separator />
+
+      <div className="flex flex-1 flex-col gap-2 px-2">
+        <div className="h-8 items-center px-2 text-xs font-medium text-ghost">
+          Platform
+        </div>
+        <ul className="flex flex-col gap-1 h-8 text-sm">
+          <li>
+            <Link to="#" className="flex items-center gap-2">
+              <TerminalSquare className="h-4 w-4"/>
+              <span>Playground</span>
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      <div className="flex flex-col gap-2"></div>
+      <Link to="/">
+        <Button variant="ghost" className="w-full justify-start text-sm">
+          <MessagesSquare className="mr-2 h-4 w-4" />
+          Threads
+        </Button>
+      </Link>
+    </nav>
   );
 };

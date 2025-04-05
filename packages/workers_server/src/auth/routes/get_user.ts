@@ -12,6 +12,8 @@ export const get_user: H = async c => {
   const [user] = await db
     .select({
       id: users_table.id,
+      image_url: users_table.image_url,
+      username: users_table.username,
       type: users_table.type,
       email: users_table.email,
       permissions: users_table.permissions,

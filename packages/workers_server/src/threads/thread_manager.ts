@@ -5,6 +5,7 @@ import {
   run_steps_table,
   runs_table,
   thread_states_table,
+  threads_table,
 } from "../db/schema";
 import type {
   Event,
@@ -92,6 +93,10 @@ export const thread_manager = {
     broadcast_event(message.thread_id, event);
 
     await db.insert(messages_table).values(message);
+    await db
+      .update(threads_table)
+      .set({ updated_at: new Date() })
+      .where(eq(threads_table.id, message.thread_id));
   },
 
   append_generating_message_token: async (

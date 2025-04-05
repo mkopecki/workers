@@ -3,7 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "NODE_ENV=DEVELOPMENT;bun run --hot src/index.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
