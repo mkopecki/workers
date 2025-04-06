@@ -17,7 +17,7 @@ export const RootLayout = () => {
 
   return (
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel defaultSize={15} maxSize={15} minSize={15}>
+      <ResizablePanel defaultSize={15} maxSize={15} minSize={15} collapsible={true} collapsedSize={4}>
         <Nav />
       </ResizablePanel>
       <ResizableHandle withHandle />
@@ -66,7 +66,7 @@ const Nav = () => {
       <div className="flex flex-col gap-2 p-4">
         <div className="flex items-center gap-2">
           <Avatar>
-              <AvatarImage src={user?.image_url} alt={user?.username} />
+            <AvatarImage src={user?.image_url} alt={user?.username} />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm">

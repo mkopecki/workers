@@ -2,6 +2,7 @@ import { ThreadData } from "workers_server/src/types";
 import { use_thread_data, use_thread_data_store } from "./use_thread_data";
 import Tree, { RawNodeDatum } from "react-d3-tree";
 import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
 const dfs_search = (node: RawNodeDatum, id: string): RawNodeDatum | null => {
   if (node.attributes.id === id) {
@@ -31,7 +32,10 @@ const build_tree_data = (thread_data: ThreadData) => {
   };
 
   for (const thread_state of thread_data.thread_states.slice(1)) {
-    const parent_node = dfs_search(root_node, thread_state.previous_thread_state_id);
+    const parent_node = dfs_search(
+      root_node,
+      thread_state.previous_thread_state_id,
+    );
     const child_node = {
       name: thread_state.id.slice(-5),
       attributes: {
@@ -50,17 +54,37 @@ export const ThreadTree = () => {
 
   const data = build_tree_data(thread_data_store.thread_data);
 
+  const shouldRecenterTreeRef = useRef(true);
+  const [treeTranslate, setTreeTranslate] = useState({ x: 0, y: 0 });
+  const treeContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (treeContainerRef.current && shouldRecenterTreeRef.current) {
+      shouldRecenterTreeRef.current = false;
+      const dimensions = treeContainerRef.current.getBoundingClientRect();
+
+      setTreeTranslate({
+        x: dimensions.width / 2,
+        y: dimensions.height / 5,
+      });
+    }
+  });
+
   const on_node_click = (id: string) => {
     console.log({ id });
     thread_data_store.load_thread_state(id);
   };
 
   const render_custom_node_element = ({ nodeDatum }) => {
-    const is_selected = thread_data_store.thread_state?.id === nodeDatum.attributes.id;
+    const is_selected =
+      thread_data_store.thread_state?.id === nodeDatum.attributes.id;
     return (
       <g>
         <circle
-          className={cn("stroke-white", is_selected ? "fill-white" : "fill-zinc-600")}
+          className={cn(
+            "stroke-white",
+            is_selected ? "fill-white" : "fill-zinc-600",
+          )}
           strokeWidth="2"
           r="8"
           onClick={() => on_node_click(nodeDatum.attributes.id)}
@@ -73,7 +97,10 @@ export const ThreadTree = () => {
   };
 
   return (
-    <div className="flex justify-center bg-slate-900 h-full">
+    <div
+      ref={treeContainerRef}
+      className="flex justify-center bg-sidebar h-full"
+    >
       <Tree
         data={data}
         orientation="vertical"
@@ -88,6 +115,7 @@ export const ThreadTree = () => {
           y: 40,
         }}
         pathFunc="step"
+        translate={treeTranslate}
       />
     </div>
   );

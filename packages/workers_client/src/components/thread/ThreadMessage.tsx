@@ -10,12 +10,34 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { format_timestamp } from "@/utils/format_timestamp";
 import { use_auth_store } from "@/auth/auth";
+import { ClipboardCopy, GitBranch, Pencil } from "lucide-react";
+import { Button } from "../ui/button";
+import { toast } from "sonner";
+import { use_thread_data_store } from "./use_thread_data";
 
 type ThreadMessageProps = {
   message: Message;
+  reset_message_form: (content: string) => void;
 };
-export const ThreadMessage: React.FC<ThreadMessageProps> = ({ message }) => {
+export const ThreadMessage: React.FC<ThreadMessageProps> = ({
+  message,
+  reset_message_form,
+}) => {
   const { user } = use_auth_store();
+
+  const thread_data_store = use_thread_data_store();
+
+  const action_jump_state = () => {
+    thread_data_store.load_thread_state(message.thread_state_id);
+    toast(`Loaded thread state ${message.thread_state_id}`);
+  };
+  const action_copy = () => {
+    navigator.clipboard.writeText(message.content);
+    toast("Copied content to clipboard.");
+  };
+  const action_edit = () => {
+    reset_message_form(message.content);
+  };
 
   const is_self = message.role === "user";
   const author = is_self ? user?.username : message.author;
@@ -60,6 +82,40 @@ export const ThreadMessage: React.FC<ThreadMessageProps> = ({ message }) => {
             >
               {message.content}
             </Markdown>
+          </div>
+          <div
+            className={cn(
+              "flex flex-row",
+              is_self ? "justify-end text-end" : "justify-start text-start",
+            )}
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-6 h-6"
+              onClick={action_jump_state}
+            >
+              <GitBranch className="w-4 h-4 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-6 h-6"
+              onClick={action_copy}
+            >
+              <ClipboardCopy className="w-4 h-4 text-muted-foreground" />
+            </Button>
+
+            {is_self && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-6 h-6"
+                onClick={action_edit}
+              >
+                <Pencil className="w-4 h-4 text-muted-foreground" />
+              </Button>
+            )}
           </div>
         </div>
       </div>

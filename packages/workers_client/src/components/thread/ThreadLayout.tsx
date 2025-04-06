@@ -1,7 +1,7 @@
 import { Separator } from "@/components/ui/separator";
 import { workers_api_client } from "@/workers_api_client";
-import { MessagesSquare, Network } from "lucide-react";
-import { Link, Outlet, useParams } from "react-router";
+import { Archive, Cog, MessagesSquare, Network, Trash } from "lucide-react";
+import { Link, NavLink, Outlet, useParams } from "react-router";
 import { Button } from "../ui/button";
 import { format_timestamp } from "@/utils/format_timestamp";
 import { use_thread_data_store } from "./use_thread_data";
@@ -16,63 +16,8 @@ import {
   SelectValue,
 } from "../ui/select";
 import { use_auth_store } from "@/auth/auth";
-
-type ModelSelectItemProps = {
-  model_id: string;
-  model_name: string;
-};
-export const ModelSelectItem: React.FC<ModelSelectItemProps> = ({
-  model_id,
-  model_name,
-}) => {
-  const { user } = use_auth_store();
-
-  if (user?.permissions?.includes(`can_access_${model_id}`)) {
-    return <SelectItem value={model_id}>{model_name}</SelectItem>;
-  } else {
-    return (
-      <SelectItem value={model_id} disabled>
-        {model_name}
-      </SelectItem>
-    );
-  }
-};
-
-const ModelSelector = () => {
-  const { id: thread_id } = useParams();
-  const thread_data_store = use_thread_data_store();
-
-  const on_value_change = async (model_id: string) => {
-    const thread = await workers_api_client.update_thread(thread_id!, {
-      model_id,
-    });
-    console.log({ thread });
-    if (thread) {
-      thread_data_store.update_thread(thread);
-    }
-  };
-
-  return (
-    <Select
-      value={thread_data_store?.thread_data?.worker_config?.model_id}
-      onValueChange={(a) => on_value_change(a)}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a timezone" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectLabel>OpenAI</SelectLabel>
-          <ModelSelectItem
-            model_id="openai_gpt_4o_mini"
-            model_name="GPT-4o-mini"
-          />
-          <ModelSelectItem model_id="openai_gpt_4o" model_name="GPT-4o" />
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  );
-};
+import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ThreadLayout = () => {
   const { id: thread_id } = useParams();
@@ -90,6 +35,19 @@ export const ThreadLayout = () => {
     }
   };
 
+  const query_client = useQueryClient();
+
+  const delete_thread = async () => {
+    await workers_api_client.delete_thread(thread_id);
+    toast("Deleted thread.");
+    query_client.invalidateQueries({ queryKey: ["threads"] });
+  };
+  const archive_thread = async () => {
+    await workers_api_client.archive_thread(thread_id);
+    toast("Archived thread.");
+    query_client.invalidateQueries({ queryKey: ["threads"] });
+  };
+
   useEffect(() => {
     load_data();
   }, [thread_id]);
@@ -98,19 +56,50 @@ export const ThreadLayout = () => {
     <div className="flex flex-col flex-1 overflow-y-auto h-full">
       <div className="flex justify-between p-2 h-12">
         <div className="flex gap-2 items-center">
-          <Link to="messages">
-            <Button variant="ghost" size="icon">
-              <MessagesSquare className="h-4 w-4" />
-            </Button>
-          </Link>
+          <NavLink to="messages">
+            {({ isActive }) => (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(isActive && "bg-muted")}
+              >
+                <MessagesSquare className="h-4 w-4" />
+              </Button>
+            )}
+          </NavLink>
 
-          <Link to="tree">
-            <Button variant="ghost" size="icon">
-              <Network className="h-4 w-4" />
-            </Button>
-          </Link>
+          <NavLink to="tree">
+            {({ isActive }) => (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(isActive && "bg-muted")}
+              >
+                <Network className="h-4 w-4" />
+              </Button>
+            )}
+          </NavLink>
+
+          <NavLink to="config">
+            {({ isActive }) => (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(isActive && "bg-muted")}
+              >
+                <Cog className="h-4 w-4" />
+              </Button>
+            )}
+          </NavLink>
         </div>
-        <ModelSelector />
+        <div className="flex gap-2 items-center" onClick={archive_thread}>
+          <Button variant="ghost" size="icon">
+            <Archive className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={delete_thread}>
+            <Trash className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       <Separator />
 
@@ -133,3 +122,6 @@ export const ThreadLayout = () => {
     </div>
   );
 };
+function toast(arg0: string) {
+  throw new Error("Function not implemented.");
+}

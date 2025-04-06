@@ -49,7 +49,6 @@ export const create_run: H = async c => {
     thread_state_id: thread_state.id,
     thread_id: data.thread_id,
     worker_id: thread.worker_id,
-    model_id: thread.worker_config.model_id,
 
     status: "processing",
   };
