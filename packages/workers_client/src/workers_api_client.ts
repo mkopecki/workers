@@ -4,6 +4,7 @@ import type { CreateRunArgs } from "workers_server/src/routes/create_run";
 import type { CreateMessageArgs } from "workers_server/src/routes/create_message";
 import { build_server_url } from "./api";
 import { ThreadUpdate } from "workers_server/src/routes/update_thread";
+import { log } from "console";
 
 const FETCH_SETTINGS = {
   credentials: "include",
@@ -16,8 +17,11 @@ const FETCH_POST_SETTINGS = {
   },
 };
 
-const get_threads = async (): Promise<Thread[] | null> => {
-  const res = await fetch(build_server_url("/api/thread"), FETCH_SETTINGS);
+const get_threads = async (
+  status: "active" | "archived",
+): Promise<Thread[] | null> => {
+  const endpoint = build_server_url(`/api/thread?status=${status}`);
+  const res = await fetch(endpoint, FETCH_SETTINGS);
   if (res.status === 200) {
     const threads = await res.json();
     return threads;
@@ -110,6 +114,31 @@ const update_thread = async (
   }
 };
 
+const get_workers = async () => {
+  const url = build_server_url(`/api/worker`);
+  const res = await fetch(url, {
+    ...FETCH_SETTINGS,
+  });
+  const workers = await res.json();
+  return workers;
+};
+
+const delete_thread = async (thread_id: string) => {
+  const url = build_server_url(`/api/thread/${thread_id}/delete`);
+  await fetch(url, {
+    ...FETCH_SETTINGS,
+    ...FETCH_POST_SETTINGS,
+  });
+};
+
+const archive_thread = async (thread_id: string) => {
+  const url = build_server_url(`/api/thread/${thread_id}/archive`);
+  await fetch(url, {
+    ...FETCH_SETTINGS,
+    ...FETCH_POST_SETTINGS,
+  });
+};
+
 export const workers_api_client = {
   get_threads,
   create_thread,
@@ -117,4 +146,8 @@ export const workers_api_client = {
   create_run,
   get_thread_data,
   update_thread,
+  get_workers,
+
+  delete_thread,
+  archive_thread,
 };

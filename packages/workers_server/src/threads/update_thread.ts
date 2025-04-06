@@ -3,18 +3,15 @@ import { threads_table } from "@src/db/schema";
 import type { H } from "hono/types";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-
-const thread_update = z.object({
-  model_id: z.string(),
-});
+import { get_worker } from "@src/workers";
 
 export type ThreadUpdate = z.infer<typeof thread_update>;
 
 export const update_thread: H = async c => {
   const thread_id = c.req.param("id");
   const payload = await c.req.json<ThreadUpdate>();
-  thread_update.parse(payload);
 
+  console.log(payload.worker_config);
   // check thread permissions
   const [thread] = await db
     .select()
@@ -25,22 +22,22 @@ export const update_thread: H = async c => {
     return c.json({ message: "Not found." }, 404);
   }
 
+  // validate payload
+  const worker = get_worker(thread.worker_id);
+  worker.config_schema.parse(payload.worker_config);
+
   // update thread model
   await db
     .update(threads_table)
     .set({
-      worker_config: {
-        model_id: payload.model_id,
-      },
+      worker_config: payload.worker_config,
     })
     .where(eq(threads_table.id, thread_id));
   console.log(`updated model_id for thread ${thread.id}`);
 
   const updated_thread = {
     ...thread,
-    worker_config: {
-      model_id: payload.model_id,
-    },
+    worker_config: payload.worker_config,
   };
   return c.json(updated_thread);
 };

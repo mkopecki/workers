@@ -3,12 +3,13 @@ import { RootLayout } from "./app/layout";
 import { Login } from "./app/login";
 import { Signup } from "./app/signup";
 import { ThreadsLayout } from "./app/threads/layout";
-import { NewThread } from "./components/thread/NewThread";
+import { NewThread } from "./components/thread/NewThread_tmp";
 import { ThreadCreationForm } from "./components/thread_creation_form/ThreadCreationForm";
 import { ThreadLayout } from "./components/thread/ThreadLayout";
 import { ThreadChat } from "./components/thread/ThreadChat";
 import { ThreadTree } from "./components/thread/ThreadTree";
 import { RootPage } from "./app/page";
+import { ThreadConfig } from "./components/thread/ThreadConfig";
 
 export const Router = () => {
   return (
@@ -27,6 +28,7 @@ export const Router = () => {
             <Route path="/threads/:id" element={<ThreadLayout />}>
               <Route path="/threads/:id/messages" element={<ThreadChat />} />
               <Route path="/threads/:id/tree" element={<ThreadTree />} />
+              <Route path="/threads/:id/config" element={<ThreadConfig />} />
             </Route>
           </Route>
         </Route>

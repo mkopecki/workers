@@ -12,6 +12,9 @@ import { create_user } from "./auth/routes/create_user";
 import { create_guest_user } from "./auth/routes/create_guest_user";
 import { create_user_session } from "./auth/routes/create_user_session";
 import { get_user } from "./auth/routes/get_user";
+import { get_workers } from "./workers/get_workers";
+import { delete_thread } from "./threads/delete_thread";
+import { archive_thread } from "./threads/archive_thread";
 
 const app = new Hono();
 
@@ -33,6 +36,7 @@ app.use("/api/*", make_auth_guard());
 
 // app routes
 app.get("/api/thread", get_threads);
+
 app.post("/api/thread", create_thread);
 app.post("/api/run", create_run);
 app.post("/api/thread/:id/message", create_message);
@@ -40,6 +44,11 @@ app.get("/api/thread/:id", get_thread_data);
 app.get("/api/thread/:id/stream", get_thread_data_stream);
 
 app.post("/api/thread/:id", update_thread);
+
+app.post("/api/thread/:id/delete", delete_thread);
+app.post("/api/thread/:id/archive", archive_thread);
+
+app.get("/api/worker", get_workers);
 
 // auth routes
 app.get("/api/user", get_user);

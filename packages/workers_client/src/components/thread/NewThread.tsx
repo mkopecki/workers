@@ -21,6 +21,7 @@ import { ModelSelectItem } from "./ThreadLayout";
 import { workers_api_client } from "@/workers_api_client";
 import { useNavigate } from "react-router";
 import { use_thread_data } from "./use_thread_data";
+import { useQuery } from "@tanstack/react-query";
 
 type NewThreadData = {
   model_id: string;
@@ -30,6 +31,13 @@ type NewThreadData = {
 export const NewThread: React.FC = () => {
   const form = useForm<NewThreadData>();
   const navigate = useNavigate();
+
+  const workers_query = useQuery({
+    queryKey: ["workers"],
+    queryFn: workers_api_client.get_workers,
+  });
+
+  console.log(workers_query.data);
 
   const { thread_data_store, create_message } = use_thread_data();
 

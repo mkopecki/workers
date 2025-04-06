@@ -40,11 +40,18 @@ export const sessions_table = pgTable("session", {
     .notNull(),
 });
 
+export const thread_status = pgEnum("thread_status", [
+  "active",
+  "archived",
+  "deleted",
+]);
 export const threads_table = pgTable("thread", {
   id: text().primaryKey(),
   name: text().notNull(),
   created_at: timestamp().defaultNow().notNull(),
   updated_at: timestamp().defaultNow().notNull(),
+
+  status: thread_status().notNull().default("active"),
 
   worker_id: text().notNull(),
   worker_config: json(),
@@ -78,7 +85,7 @@ export const runs_table = pgTable("run", {
     .references(() => thread_states_table.id)
     .notNull(),
 
-  model_id: text().notNull(),
+  model_id: text(),
   worker_id: text().notNull(),
 
   status: run_status().notNull(),
