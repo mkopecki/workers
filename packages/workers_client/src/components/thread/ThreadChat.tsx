@@ -11,6 +11,7 @@ import { ExtendedRun, ThreadState } from "workers_server/src/types";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Form } from "../ui/form";
 
 type MessageEditorInputs = {
   message_content: string;
@@ -79,11 +80,14 @@ export const ThreadChat = () => {
         )}
       </div>
       <Separator />
-      <ThreadMessageEditor
-        form={form}
-        handle_submit={handle_submit}
-        handle_key_press={handle_key_press}
-      />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handle_submit)}
+          onKeyDown={handle_key_press}
+        >
+          <ThreadMessageEditor form={form} />
+        </form>
+      </Form>
     </div>
   );
 };

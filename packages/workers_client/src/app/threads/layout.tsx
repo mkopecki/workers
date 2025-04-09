@@ -125,7 +125,7 @@ const ThreadCard = ({ thread }: { thread: Thread }) => {
                 isActive ? "text-foreground" : "text-muted-foreground",
               )}
             >
-              {formatDistanceToNow(thread.updated_at)}
+              {formatDistanceToNow(thread.updated_at)} ago
             </div>
             <div className="font-semibold">{thread.name}</div>
           </div>
