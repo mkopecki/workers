@@ -1,65 +1,57 @@
-import { useForm } from "react-hook-form";
+import { Separator } from "@radix-ui/react-separator";
+import { ThreadMessageEditor } from "./ThreadMessageEditor";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { useQuery } from "@tanstack/react-query";
+import { workers_api_client } from "@/workers_api_client";
+import { Button } from "../ui/button";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
-  Form,
 } from "../ui/form";
-import { Textarea } from "../ui/textarea";
-import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
-import {
-  SelectTrigger,
-  Select,
-  SelectContent,
-  SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from "../ui/select";
-import { ModelSelectItem } from "./ThreadLayout";
-import { workers_api_client } from "@/workers_api_client";
+import { WorkerConfigSubform } from "./WorkerConfigForm";
 import { useNavigate } from "react-router";
-import { use_thread_data } from "./use_thread_data";
-import { useQuery } from "@tanstack/react-query";
 
-type NewThreadData = {
-  model_id: string;
-  message: string;
-};
+type FormData = {
+    worker_id: string
+    message_content: string;
+}
 
-export const NewThread: React.FC = () => {
-  const form = useForm<NewThreadData>();
-  const navigate = useNavigate();
-
+export const NewThread = () => {
   const workers_query = useQuery({
     queryKey: ["workers"],
     queryFn: workers_api_client.get_workers,
   });
 
-  console.log(workers_query.data);
+  const form = useForm<FormData>();
+  const worker_id = form.watch("worker_id");
+  const worker = workers_query.data?.find((w) => w.id === worker_id);
 
-  const { thread_data_store, create_message } = use_thread_data();
-
-  const on_submit: SubmitHandler<NewThreadData> = async (data) => {
-    // create thread
+  const navigate = useNavigate();
+  const on_submit: SubmitHandler<FormData> = async (data: any) => {
     const { thread, thread_state } = await workers_api_client.create_thread({
-      name: "Test",
-      worker_id: "basic_chat_worker",
+      name: "No Name",
+      worker_id: data.worker_id,
       worker_config: {
-        model_id: data.model_id,
+        ...data.worker_config,
       },
     });
 
     const message_thread_state = await workers_api_client.create_message(
       thread.id,
       {
-        content: data.message,
+        content: data.message_content,
         current_thread_state_id: thread_state.id,
       },
     );
 
-    const run_thread_state = await workers_api_client.create_run({
+    await workers_api_client.create_run({
       thread_id: thread.id,
       current_thread_state_id: message_thread_state.id,
     });
@@ -68,73 +60,62 @@ export const NewThread: React.FC = () => {
   };
 
   return (
-    <div className="flex w-full h-full p-6 justify-center items-center">
+    <div className="flex flex-col h-full gap-6">
       <Form {...form}>
         <form
-          className="flex flex-col gap-4 w-full"
           onSubmit={form.handleSubmit(on_submit)}
+          className="flex flex-col gap-2 h-full"
         >
-          <h1 className="text-center text-2xl">Start a Chat</h1>
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-4">
-              <FormField
-                control={form.control}
-                name="message"
-                render={({ field }) => (
-                  <FormItem className="grow">
-                    <FormControl>
-                      <Textarea
-                        placeholder="Type your message here."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <div className="flex-1 flex items-end">
+            <div className="flex gap-4 p-4 items-end">
+              <ScrollArea className="flex flex-col gap-2 p-4 border rounded-mg">
+                <h4 className="mb-4 text-sm font-medium leadining-none">
+                  Workers
+                </h4>
 
-              <Button
-                type="submit"
-                className="w-24 h-full"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting && (
-                  <Loader2 className="animate-spin" />
+                <FormField
+                  control={form.control}
+                  name="worker_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          {workers_query.data &&
+                            workers_query.data.map((w) => (
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value={w.id} />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {w.id}
+                                </FormLabel>
+                              </FormItem>
+                            ))}
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </ScrollArea>
+
+              <div className="flex flex-col gap-2 p-4 border rounded-mg">
+                {worker && (
+                  <WorkerConfigSubform
+                    form={form}
+                    config_schema_json={worker.config_schema_json}
+                  />
                 )}
-                Send
-              </Button>
+              </div>
             </div>
-
-            <FormField
-              control={form.control}
-              name="model_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select required onValueChange={field.onChange}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select a model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>OpenAI</SelectLabel>
-                          <ModelSelectItem
-                            model_id="openai_gpt_4o_mini"
-                            model_name="GPT-4o-mini"
-                          />
-                          <ModelSelectItem
-                            model_id="openai_gpt_4o"
-                            model_name="GPT-4o"
-                          />
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+          <Separator />
+          <ThreadMessageEditor
+            form={form}
+          />
         </form>
       </Form>
     </div>

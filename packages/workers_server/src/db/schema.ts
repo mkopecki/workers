@@ -126,3 +126,14 @@ export const messages_table = pgTable("message", {
   author: text().notNull(),
   content: text().notNull(),
 });
+
+export const files_table = pgTable("file", {
+  id: text().primaryKey(),
+  created_at: timestamp().defaultNow().notNull(),
+
+  name: text().notNull(),
+  type: text(),
+
+  provider: text(),
+  provider_id: text(),
+});
