@@ -1,6 +1,6 @@
 import { sum, eq } from "drizzle-orm";
-import { db } from "./db/db";
-import { balance_transactions_table, users_table } from "./db/schema";
+import { db } from "@src/db";
+import { balance_transactions_table, users_table } from "@src/db/schema";
 import cuid from "cuid";
 import type { User } from "./types";
 import { permissions } from "./auth/permissions";

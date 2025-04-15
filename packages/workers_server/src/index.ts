@@ -1,20 +1,11 @@
 import { Hono } from "hono";
-import { create_message } from "./threads/create_message";
 import { cors } from "hono/cors";
-import { get_threads } from "./threads/get_threads";
-import { create_thread } from "./threads/create_thread";
-import { create_run } from "./threads/create_run";
-import { get_thread_data } from "./threads/get_thread_data";
-import { get_thread_data_stream } from "./threads/get_thread_data_stream";
-import { update_thread } from "./threads/update_thread";
 import { make_auth_guard } from "./auth/jwt";
-import { create_user } from "./auth/routes/create_user";
-import { create_guest_user } from "./auth/routes/create_guest_user";
-import { create_user_session } from "./auth/routes/create_user_session";
-import { get_user } from "./auth/routes/get_user";
-import { get_workers } from "./workers/get_workers";
-import { delete_thread } from "./threads/delete_thread";
-import { archive_thread } from "./threads/archive_thread";
+import { worker_routes } from "./workers/routes";
+import { runner } from "./workers/runner";
+import { client_routes } from "./client/routes";
+
+const runner_promise = runner.start();
 
 const app = new Hono();
 
@@ -32,29 +23,35 @@ app.use(
   })
 );
 
+// worker routes
+app.get("/worker/run/:id", worker_routes.get_run);
+app.post("/worker/run/:id/step", worker_routes.create_run_step);
+app.get("/worker/thread/:id/state/:thread_state_id", worker_routes.get_thread);
+app.post("/worker/thread/:thread_id/message", worker_routes.create_message);
+app.post("/worker/thread/:thread_id/message/chunk", worker_routes.create_message_chunk);
+
+// client routes
 app.use("/api/*", make_auth_guard());
 
-// app routes
-app.get("/api/thread", get_threads);
+app.get("/api/thread", client_routes.threads.get_threads);
+app.post("/api/thread/:id/delete", client_routes.threads.delete_thread);
+app.post("/api/thread/:id/archive", client_routes.threads.archive_thread);
+app.post("/api/thread", client_routes.threads.create_thread);
+app.get("/api/thread/:id", client_routes.threads.get_thread);
+app.get(
+  "/api/thread/:id/stream",
+  client_routes.threads.get_thread_event_stream
+);
+app.post("/api/thread/:id/message", client_routes.threads.create_message);
+app.post("/api/thread/:id", client_routes.threads.update_thread);
 
-app.post("/api/thread", create_thread);
-app.post("/api/run", create_run);
-app.post("/api/thread/:id/message", create_message);
-app.get("/api/thread/:id", get_thread_data);
-app.get("/api/thread/:id/stream", get_thread_data_stream);
-
-app.post("/api/thread/:id", update_thread);
-
-app.post("/api/thread/:id/delete", delete_thread);
-app.post("/api/thread/:id/archive", archive_thread);
-
-app.get("/api/worker", get_workers);
+app.get("/api/worker", client_routes.workers.get_workers);
+app.post("/api/run", client_routes.runs.create_run);
 
 // auth routes
-app.get("/api/user", get_user);
-app.post("/auth/user", create_user);
-// app.post("/auth/user/guest", create_guest_user);
-app.post("/auth/user/session", create_user_session);
+app.get("/api/user", client_routes.auth.get_user);
+app.post("/auth/user", client_routes.auth.create_user);
+app.post("/auth/user/session", client_routes.auth.create_user_session);
 
 app.get("/ping", c => c.text("pong"));
 

@@ -1,0 +1,4 @@
+id = "test_worker"
+name = "Test Worker"
+entrypoint_path = "index.ts"
+config_schema_path = "config_schema.json"

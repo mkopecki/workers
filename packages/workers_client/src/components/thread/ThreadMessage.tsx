@@ -80,7 +80,7 @@ export const ThreadMessage: React.FC<ThreadMessageProps> = ({
               rehypePlugins={[rehypeKatex, rehypeRaw]}
               components={{ code: CodeBlock }}
             >
-              {message.content}
+              {message.content.text}
             </Markdown>
           </div>
           <div
