@@ -37,7 +37,7 @@ export const ThreadConfig = () => {
           {worker && (
             <WorkerConfigSubform
               form={form}
-              config_schema_json={worker.config_schema_json}
+              config_schema={worker.config_schema}
             />
           )}
 

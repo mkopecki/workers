@@ -44,31 +44,12 @@ const SelectInput = ({ form, values, name }) => {
   );
 };
 
-export const WorkerConfig = ({
-  config_schema_json,
-}: {
-  config_schema_json: string;
-}) => {
-  const form = useForm();
-
-  const on_submit: SubmitHandler<any> = async (data: any) => {
-    console.log(data);
-  };
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(on_submit)}></form>
-    </Form>
-  );
-};
-
-export const WorkerConfigSubform = ({ form, config_schema_json }) => {
-  const config_properties =
-    config_schema_json.definitions.config_schema.properties;
+export const WorkerConfigSubform = ({ form, config_schema }) => {
+  const {properties} = config_schema;
 
   return (
     <div>
-      {Object.entries(config_properties).map(([name, p]) => {
+      {Object.entries(properties).map(([name, p]) => {
         if (p.type === "string") {
           if ("const" in p) {
             return <SelectInput form={form} name={name} values={[p.const]} />;

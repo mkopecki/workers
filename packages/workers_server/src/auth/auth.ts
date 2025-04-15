@@ -1,6 +1,5 @@
 import type { Thread } from "@src/types";
-import type { JWTPayload } from "./jwt";
-import { db } from "@src/db/db";
+import { db } from "@src/db";
 import { threads_table } from "@src/db/schema";
 import { eq } from "drizzle-orm";
 

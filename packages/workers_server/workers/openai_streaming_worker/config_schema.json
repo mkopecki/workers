@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "model": {
+      "enum": ["gpt-4o", "gpt-4o-mini"],
+      "type": "string"
+    }
+  },
+  "required": ["model"]
+}

@@ -24,6 +24,7 @@ export const ThreadLayout = () => {
 
   const thread_data_store = use_thread_data_store();
   const { thread_data } = thread_data_store;
+  console.log({thread_data});
 
   const load_data = async () => {
     const new_thread_data = await workers_api_client.get_thread_data(thread_id);

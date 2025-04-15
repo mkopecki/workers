@@ -193,10 +193,10 @@ export const use_thread_data_store = create<ThreadDataStore>((set, get) => ({
               ...ts,
               messages: ts.messages.map((m) => {
                 if (message_id === m.id) {
-                  if (m.version < version) {
+                  if (true) {
                     return {
                       ...m,
-                      content: m.content + token,
+                      content: { text: m.content.text + token },
                       version,
                     };
                   } else {

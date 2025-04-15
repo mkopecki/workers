@@ -7,22 +7,15 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-export const user_type = pgEnum("user_type", ["user", "guest"]);
-
+// auth
 export const users_table = pgTable("user", {
   id: text().primaryKey(),
   created_at: timestamp().defaultNow().notNull(),
-
-  type: user_type().notNull(),
-
   image_url: text(),
   username: text(),
   email: text(),
   hashed_password: text(),
-
   permissions: text().array(),
-
-  guest_id: text(),
 });
 
 export const balance_transactions_table = pgTable("balance_transaction", {
@@ -32,14 +25,7 @@ export const balance_transactions_table = pgTable("balance_transaction", {
   user_id: text().references(() => users_table.id),
 });
 
-export const sessions_table = pgTable("session", {
-  id: text().primaryKey(),
-  created_at: timestamp().defaultNow().notNull(),
-  user_id: text()
-    .references(() => users_table.id)
-    .notNull(),
-});
-
+// thread
 export const thread_status = pgEnum("thread_status", [
   "active",
   "archived",
@@ -64,31 +50,49 @@ export const threads_table = pgTable("thread", {
 export const thread_states_table = pgTable("thread_state", {
   id: text().primaryKey(),
   created_at: timestamp().defaultNow().notNull(),
+  thread_id: text()
+    .references(() => threads_table.id)
+    .notNull(),
+  previous_thread_state_id: text(),
+});
 
+export const message_role = pgEnum("message_role", [
+  "system",
+  "assistant",
+  "user",
+]);
+export const messages_table = pgTable("message", {
+  id: text().primaryKey(),
+  created_at: timestamp().defaultNow().notNull(),
+
+  thread_state_id: text()
+    .references(() => thread_states_table.id)
+    .notNull(),
   thread_id: text()
     .references(() => threads_table.id)
     .notNull(),
 
-  // TODO: add self-reference if possible
-  previous_thread_state_id: text(),
+  role: message_role().notNull(),
+  author: text().notNull(),
+  content: json(),
 });
 
-export const run_status = pgEnum("run_status", ["processing", "done", "error"]);
+// runs
+export const run_status = pgEnum("run_status", [
+  "queued",
+  "processing",
+  "success",
+  "error",
+]);
 export const runs_table = pgTable("run", {
   id: text().primaryKey(),
   created_at: timestamp().defaultNow().notNull(),
 
-  thread_id: text()
-    .references(() => threads_table.id)
-    .notNull(),
-  thread_state_id: text()
-    .references(() => thread_states_table.id)
-    .notNull(),
-
-  model_id: text(),
   worker_id: text().notNull(),
-
   status: run_status().notNull(),
+
+  config: json(),
+  args: json(),
 });
 
 export const run_steps_table = pgTable("run_step", {
@@ -102,38 +106,16 @@ export const run_steps_table = pgTable("run_step", {
   description: text().notNull(),
 });
 
-export const message_role = pgEnum("message_role", [
-  "system",
-  "assistant",
-  "user",
-]);
-export const message_status = pgEnum("message_status", ["generating", "done"]);
-export const messages_table = pgTable("message", {
-  id: text().primaryKey(),
-  created_at: timestamp().defaultNow().notNull(),
-
-  thread_state_id: text()
-    .references(() => thread_states_table.id)
-    .notNull(),
-  thread_id: text()
-    .references(() => threads_table.id)
-    .notNull(),
-
-  version: integer(),
-  status: message_status().notNull(),
-
-  role: message_role().notNull(),
-  author: text().notNull(),
-  content: text().notNull(),
-});
-
+// file tooling
 export const files_table = pgTable("file", {
   id: text().primaryKey(),
   created_at: timestamp().defaultNow().notNull(),
 
-  name: text().notNull(),
-  type: text(),
+  thread_id: text()
+    .references(() => threads_table.id)
+    .notNull(),
 
-  provider: text(),
-  provider_id: text(),
+  name: text().notNull(),
+  // base64 data
+  data: text().notNull(),
 });
