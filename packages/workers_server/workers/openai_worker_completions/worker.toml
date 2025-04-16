@@ -1,4 +1,4 @@
-id = "openai_streaming_worker"
-name = "OpenAI Worker"
+id = "openai_worker_completions"
+name = "OpenAI Worker (Completions API)"
 entrypoint_path = "openai_worker.ts"
 config_schema_path = "config_schema.json"

@@ -2,11 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "test": {
+    "model": {
+      "enum": ["claude-3-5-haiku-latest", "claude-3-7-sonnet-latest"],
       "type": "string"
     }
   },
-  "required": [
-    "test"
-  ]
+  "required": ["model"]
 }

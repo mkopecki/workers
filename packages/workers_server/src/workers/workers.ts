@@ -1,4 +1,3 @@
-import type { Run } from "@src/types";
 import { readdir } from "node:fs/promises";
 import path from "path";
 import { z } from "zod";
@@ -64,4 +63,5 @@ const load_workers = async () => {
 
   return workers;
 };
+
 export const workers = await load_workers();
