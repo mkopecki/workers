@@ -1,0 +1,4 @@
+id = "openai_worker_reasoning_completions"
+name = "OpenAI Reasoning Worker (Completions API)"
+entrypoint_path = "openai_worker_reasoning_completions.ts"
+config_schema_path = "config_schema.json"

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "model": {
+      "enum": ["o3-mini", "o3", "o4-mini"],
+      "type": "string"
+    },
+    "reasoning_effort": {
+      "enum": ["low", "medium", "high"],
+      "type": "string"
+    }
+  },
+  "required": ["model", "reasoning_effort"]
+}

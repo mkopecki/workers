@@ -39,6 +39,10 @@ const run_worker = async (run: Run) => {
     const entrypoint = path.join(worker.worker_dir, worker.entrypoint_path);
 
     console.log("spawning worker");
+    // const proc = Bun.spawn(["bun", entrypoint, run.id], {
+    //   stdout: "inherit",
+    //   stderr: "inherit",
+    // });
     const proc = Bun.spawn(["bun", entrypoint, run.id], {
       stdout: "inherit",
       stderr: "inherit",

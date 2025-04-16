@@ -1,0 +1,4 @@
+id = "anthropic_worker"
+name = "Anthropic Worker"
+entrypoint_path = "anthropic_worker.ts"
+config_schema_path = "config_schema.json"

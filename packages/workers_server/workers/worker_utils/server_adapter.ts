@@ -26,7 +26,7 @@ const create_message = async ({
   run_id,
   author,
   content,
-}): Promise<void> => {
+}): Promise<any> => {
   const data = {
     run_id,
     thread_state_id,
@@ -35,7 +35,42 @@ const create_message = async ({
   };
 
   const route = `/thread/${thread_id}/message`;
+  const res = await client.post(route, data);
+  return res.data;
+};
+
+const create_message_chunk = async ({
+  message_id,
+  run_id,
+  thread_id,
+  thread_state_id,
+  version,
+  content_chunk,
+}): Promise<void> => {
+  const data = {
+    message_id,
+    run_id,
+    thread_state_id,
+    content_chunk,
+    version,
+    author: "",
+  };
+
+  const route = `/thread/${thread_id}/message/chunk`;
   await client.post(route, data);
+};
+
+const create_message_stream = async ({
+  thread_id,
+  thread_state_id,
+  message_id,
+  stream,
+}): Promise<void> => {
+  const route = `http://localhost:3000/worker/thread/${thread_id}/${thread_state_id}/message/${message_id}/stream`;
+  fetch(route, {
+    method: "POST",
+    body: stream,
+  });
 };
 
 const create_run_step = async (
@@ -53,5 +88,7 @@ export const server_adapter = {
   get_run,
   get_thread,
   create_message,
+  create_message_chunk,
   create_run_step,
+  create_message_stream,
 };

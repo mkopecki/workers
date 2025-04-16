@@ -19,9 +19,9 @@ import { WorkerConfigSubform } from "./WorkerConfigForm";
 import { useNavigate } from "react-router";
 
 type FormData = {
-    worker_id: string
-    message_content: string;
-}
+  worker_id: string;
+  message_content: string;
+};
 
 export const NewThread = () => {
   const workers_query = useQuery({
@@ -59,6 +59,8 @@ export const NewThread = () => {
     await navigate(`/threads/${thread.id}/messages`);
   };
 
+  console.log(worker);
+
   return (
     <div className="flex flex-col h-full gap-6">
       <Form {...form}>
@@ -90,7 +92,7 @@ export const NewThread = () => {
                                   <RadioGroupItem value={w.id} />
                                 </FormControl>
                                 <FormLabel className="font-normal">
-                                  {w.id}
+                                  {w.name}
                                 </FormLabel>
                               </FormItem>
                             ))}
@@ -102,20 +104,18 @@ export const NewThread = () => {
                 />
               </ScrollArea>
 
-              <div className="flex flex-col gap-2 p-4 border rounded-mg">
-                {worker && (
+              {worker && (
+                <div className="flex flex-col gap-2 p-4 border rounded-mg">
                   <WorkerConfigSubform
                     form={form}
                     config_schema={worker.config_schema}
                   />
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
           <Separator />
-          <ThreadMessageEditor
-            form={form}
-          />
+          <ThreadMessageEditor form={form} />
         </form>
       </Form>
     </div>

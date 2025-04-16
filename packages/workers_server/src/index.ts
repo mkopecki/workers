@@ -4,6 +4,7 @@ import { make_auth_guard } from "./auth/jwt";
 import { worker_routes } from "./workers/routes";
 import { runner } from "./workers/runner";
 import { client_routes } from "./client/routes";
+import { create_message_stream } from "./workers/routes/create_message_stream";
 
 const runner_promise = runner.start();
 
@@ -28,7 +29,14 @@ app.get("/worker/run/:id", worker_routes.get_run);
 app.post("/worker/run/:id/step", worker_routes.create_run_step);
 app.get("/worker/thread/:id/state/:thread_state_id", worker_routes.get_thread);
 app.post("/worker/thread/:thread_id/message", worker_routes.create_message);
-app.post("/worker/thread/:thread_id/message/chunk", worker_routes.create_message_chunk);
+app.post(
+  "/worker/thread/:thread_id/message/chunk",
+  worker_routes.create_message_chunk
+);
+app.post(
+  "/worker/thread/:thread_id/:thread_state_id/message/:message_id/stream",
+  create_message_stream
+);
 
 // client routes
 app.use("/api/*", make_auth_guard());

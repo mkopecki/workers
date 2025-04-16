@@ -1,5 +1,6 @@
-import { server_adapter } from "./server_adapter";
 import OpenAI from "openai";
+import { server_adapter } from "../worker_utils/server_adapter";
+import { server_format_transform } from "../worker_utils/openai_adapter";
 
 const run_id = Bun.argv[2];
 
@@ -33,20 +34,14 @@ const completion_stream = await openai_client.chat.completions.create({
   stream: true,
 });
 
-let i = 0;
-for await (const chunk of completion_stream) {
-  const delta = chunk.choices[0]?.delta?.content;
+const message_stream = completion_stream
+  .toReadableStream()
+  .pipeThrough(new TextDecoderStream())
+  .pipeThrough(server_format_transform);
 
-  if (delta) {
-    await server_adapter.create_message_chunk({
-      message_id: message.id,
-      run_id,
-      thread_id,
-      thread_state_id,
-      content_chunk: delta,
-      version: i,
-    });
-
-    i++;
-  }
-}
+await server_adapter.create_message_stream({
+  thread_id,
+  thread_state_id,
+  message_id: message.id,
+  stream: message_stream,
+});
