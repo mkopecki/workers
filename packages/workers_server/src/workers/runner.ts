@@ -43,7 +43,7 @@ const spawn_proc = (worker: Worker, run: Run): Subprocess => {
     }
 
     case "python": {
-      const proc = Bun.spawn(["bun", entrypoint, run.id], {
+      const proc = Bun.spawn(["python", entrypoint, run.id], {
         stdout: "inherit",
         stderr: "inherit",
       });
