@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const WORKERS_PATH = "workers";
 
-type Worker = {
+export type Worker = {
   id: string;
   name: string;
 
@@ -13,6 +13,8 @@ type Worker = {
 
   entrypoint_path: string;
   config_schema: string;
+
+  type: "bun" | "python";
 };
 
 const worker_config = z.object({
@@ -21,6 +23,8 @@ const worker_config = z.object({
 
   entrypoint_path: z.string(),
   config_schema_path: z.string(),
+
+  type: z.enum(["bun", "python"]),
 });
 
 const load_workers = async () => {
@@ -50,11 +54,13 @@ const load_workers = async () => {
         id: config.id,
         name: config.name,
         entrypoint_path: config.entrypoint_path,
+        type: config.type,
 
         worker_dir,
         config_path,
 
         config_schema,
+
       };
 
       return worker;

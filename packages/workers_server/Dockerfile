@@ -14,8 +14,20 @@ RUN bun install
 COPY . .
 
 # Stage 2: Production
-FROM oven/bun:latest
+FROM oven/bun:debian
 WORKDIR /app
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        python3 python3-venv python3-pip; \
+    ln -s /usr/bin/python3 /usr/local/bin/python; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
+
+# sanity-check (optional)
+RUN python --version && pip --version
+RUN pip install openai-agents --break-system-packages
 
 # Copy built files from the builder stage
 COPY --from=builder /app .
