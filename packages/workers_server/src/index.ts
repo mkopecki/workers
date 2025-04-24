@@ -10,14 +10,18 @@ const runner_promise = runner.start();
 
 const app = new Hono();
 
+const origin = [
+  "http://client.localhost",
+  "http://localhost:5173",
+  `https://${process.env.CLIENT_HOST}`,
+];
+console.log(process.env);
+console.log(origin);
+
 app.use(
   "/*",
   cors({
-    origin: [
-      "http://client.localhost",
-      "http://localhost:5173",
-      `https://${process.env.CLIENT_HOST}`,
-    ],
+    origin,
     allowMethods: ["GET", "POST", "OPTIONS", "PATCH"],
     allowHeaders: ["Content-Type"],
     credentials: true,
