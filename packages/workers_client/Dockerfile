@@ -1,14 +1,17 @@
-FROM oven/bun:latest as build
+# FROM oven/bun:latest as build
+FROM node:22-alpine as build
 WORKDIR /app
 
 COPY package.json ./
 COPY packages packages
 
-RUN bun install
+# RUN bun install
+RUN npm install
 COPY . .
 
 WORKDIR /app/packages/workers_client
-RUN bun run build_unsafe
+# RUN bun run build_unsafe
+RUN npm run build_unsafe
 
 FROM nginx:stable-alpine
 COPY ./packages/workers_client/nginx.conf /etc/nginx/conf.d/default.conf
