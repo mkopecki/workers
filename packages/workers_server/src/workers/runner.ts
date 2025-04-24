@@ -2,8 +2,10 @@ import { db } from "@src/db";
 import { runs_table } from "@src/db/schema";
 import { eq } from "drizzle-orm";
 import { workers } from "./workers";
+import type { Worker } from "./workers";
 import path from "path";
 import type { Run } from "@src/types";
+import type { Subprocess } from "bun";
 
 const RUN_BATCH_SIZE = 1;
 const ITER_SLEEP_TIME = 1000;
@@ -26,6 +28,30 @@ const start = async () => {
   }
 };
 
+const spawn_proc = (worker: Worker, run: Run): Subprocess => {
+  const entrypoint = path.join(worker.worker_dir, worker.entrypoint_path);
+
+  console.log("spawning worker");
+
+  switch (worker.type) {
+    case "bun": {
+      const proc = Bun.spawn(["bun", entrypoint, run.id], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      return proc;
+    }
+
+    case "python": {
+      const proc = Bun.spawn(["bun", entrypoint, run.id], {
+        stdout: "inherit",
+        stderr: "inherit",
+      });
+      return proc;
+    }
+  }
+};
+
 const run_worker = async (run: Run) => {
   await db
     .update(runs_table)
@@ -36,17 +62,8 @@ const run_worker = async (run: Run) => {
     const worker = workers.find(x => x.id === run.worker_id);
     if (!worker) throw new Error("worker not found");
 
-    const entrypoint = path.join(worker.worker_dir, worker.entrypoint_path);
+    const proc = spawn_proc(worker, run);
 
-    console.log("spawning worker");
-    // const proc = Bun.spawn(["bun", entrypoint, run.id], {
-    //   stdout: "inherit",
-    //   stderr: "inherit",
-    // });
-    const proc = Bun.spawn(["bun", entrypoint, run.id], {
-      stdout: "inherit",
-      stderr: "inherit",
-    });
     const exit_code = await proc.exited;
 
     if (exit_code === 0) {
