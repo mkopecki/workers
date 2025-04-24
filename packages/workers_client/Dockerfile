@@ -2,6 +2,8 @@
 FROM node:22-alpine as build
 WORKDIR /app
 
+RUN echo "VITE_SERVER_HOST at build: '$VITE_SERVER_HOST'"
+
 COPY package.json ./
 COPY packages packages
 
