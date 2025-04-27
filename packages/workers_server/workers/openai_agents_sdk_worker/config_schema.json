@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "model": {
-      "enum": ["gpt-4o", "gpt-4o-mini"],
+      "enum": ["gpt-4o-mini"],
       "type": "string"
     }
   },

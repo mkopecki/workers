@@ -7,7 +7,7 @@ run = get_run(run_id)
 print(run_id)
 print(run)
 
-agent = Agent(name="Assistant", instructions="You are a helpful assistant")
+agent = Agent(name="Assistant", instructions="You are a helpful assistant", model=run["config"]["model"])
 
 result = Runner.run_sync(
     agent, "Write a haiku about recursion in programming.")
