@@ -147,3 +147,6 @@ dist
 # env files
 **/.env
 **/.env.development
+
+.env
+.env.development
