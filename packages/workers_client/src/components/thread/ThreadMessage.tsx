@@ -32,11 +32,11 @@ export const ThreadMessage: React.FC<ThreadMessageProps> = ({
     toast(`Loaded thread state ${message.thread_state_id}`);
   };
   const action_copy = () => {
-    navigator.clipboard.writeText(message.content);
+    navigator.clipboard.writeText(message.content.text);
     toast("Copied content to clipboard.");
   };
   const action_edit = () => {
-    reset_message_form(message.content);
+    reset_message_form(message.content.text);
   };
 
   const is_self = message.role === "user";
