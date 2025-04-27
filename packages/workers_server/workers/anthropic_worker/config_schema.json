@@ -3,7 +3,7 @@
   "type": "object",
   "properties": {
     "model": {
-      "enum": ["claude-3-5-haiku-latest", "claude-3-7-sonnet-latest"],
+      "enum": ["claude-3-5-haiku-latest"],
       "type": "string"
     }
   },

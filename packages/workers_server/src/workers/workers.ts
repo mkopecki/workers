@@ -29,7 +29,7 @@ const worker_config = z.object({
 
 const load_workers = async () => {
   const files = await readdir(WORKERS_PATH, { recursive: true });
-  const toml_files = files.filter(x => x.includes("toml"));
+  const toml_files = files.filter(x => x.includes("worker.toml"));
 
   const workers = Promise.all(
     toml_files.map(async toml_file => {

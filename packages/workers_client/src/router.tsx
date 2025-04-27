@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { RootLayout } from "./app/layout";
 import { Login } from "./app/login";
 import { Signup } from "./app/signup";
@@ -19,7 +19,7 @@ export const Router = () => {
         <Route path="/signup" element={<Signup />} />
 
         <Route element={<RootLayout />}>
-          <Route index element={<RootPage />} />
+          <Route index element={<Navigate to="threads"/>} />
 
           <Route path="/threads" element={<ThreadsLayout />}>
             <Route index element={<NewThread />} />
