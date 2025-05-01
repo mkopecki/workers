@@ -1,16 +1,13 @@
 use bollard::container::Config;
-use bollard::container::{CreateContainerOptions, StartContainerOptions, RemoveContainerOptions, LogsOptions, LogOutput};
-use bollard::exec::{CreateExecOptions, StartExecResults};
+use bollard::container::{CreateContainerOptions, StartContainerOptions, LogsOptions};
 use bollard::{Docker, API_DEFAULT_VERSION};
 
 use futures_util::stream::StreamExt;
-use futures_util::TryStreamExt;
+use anyhow::Result;
 
 const IMAGE: &str = "test_worker:local";
 
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
+pub async fn process_run(run_id: String) -> Result<()> {
     let docker = Docker::connect_with_socket("/Users/maximkopecki/.colima/default/docker.sock", 120, API_DEFAULT_VERSION).unwrap();
 
 
@@ -19,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
         tty: Some(true),
         attach_stdout: Some(true),
         attach_stderr: Some(true),
-        cmd: Some(vec!["foo".to_string()]),
+        cmd: Some(vec![run_id]),
         ..Default::default()
     };
 
