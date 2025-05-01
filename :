@@ -1,0 +1,18 @@
+use containerd_client::{
+    connect,
+    services::v1::version_client::VersionClient, 
+};
+use anyhow::Result;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+
+    let addr = "unix:///Users/maximkopecki/.lima/ct/sock/containerd.sock";
+    let channel = connect(addr).await?;
+
+    let mut client = VersionClient::new(channel);
+    let resp = client.version(()).await.unwrap();
+
+    println!("Response: {:?}", resp.get_ref());
+    Ok(())
+}
