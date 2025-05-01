@@ -2,9 +2,7 @@
 
 diesel::table! {
     run (id) {
-        id -> Nullable<Integer>,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
+        id -> Text,
         status -> Text,
     }
 }

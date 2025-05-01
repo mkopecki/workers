@@ -1,26 +1,28 @@
-use actix_web::{ error::ErrorInternalServerError, get, middleware, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder };
+use actix_web::{ error::ErrorInternalServerError, get, middleware, post, web, App, HttpResponse, HttpServer, Responder };
 use diesel::{ prelude::*, r2d2 };
-use uuid::Uuid;
 
 mod actions;
 mod models;
+mod schema;
 
 type DbPool = r2d2::Pool<r2d2::ConnectionManager<SqliteConnection>>;
 
 #[post("/run")]
-async fn create_run(pool: web::Data<DbPool>, form: web::Json<models::NewRun>) -> actix_web::Result<impl Responder> {
-
+async fn create_run(pool: web::Data<DbPool>) -> actix_web::Result<impl Responder> {
+    println!("test a");
     let run = web::block(move || {
-        let mut conn = pool.get();
-        actions::insert_new_run(&mut conn);
-    });
+        let mut conn = pool.get()?;
+        actions::insert_new_run(&mut conn)
+    })
+    .await?
+    .map_err(ErrorInternalServerError)?;
 
-
-    Ok(NamedFile::open("static/favicon.ico")?)
+    Ok(HttpResponse::Created().json(run))
 }
 
 #[get("/run/{run_id}")]
-async fn get_run(pool: web::Data<DbPool>, run_id: web::Path<Uuid>) -> actix_web::Result<impl Responder> {
+async fn get_run(pool: web::Data<DbPool>, run_id: web::Path<String>) -> actix_web::Result<impl Responder> {
+    println!("test b");
     let run_id = run_id.into_inner();
 
     let run = web::block(move || {
@@ -32,17 +34,18 @@ async fn get_run(pool: web::Data<DbPool>, run_id: web::Path<Uuid>) -> actix_web:
     
     Ok(match run {
         Some(run) => HttpResponse::Ok().json(run),
-        None => HttpResponse::NotFound().body(format!("No run found with UID: {run_id}")),
+        None => HttpResponse::NotFound().body("run not found"),
     })
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenvy::dotenv().ok();
     let pool = initialize_db_pool();
 
     log::info!("starting HTTP server at http://localhost:8080");
 
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
             .wrap(middleware::Logger::default())
             .app_data(web::Data::new(pool.clone()))
@@ -61,7 +64,3 @@ fn initialize_db_pool() -> DbPool {
         .build(manager)
         .expect("database URL should be valid path to SQLite DB file")
 }
-
-
-// create run
-// get run
