@@ -1,6 +1,2 @@
-console.log("test");
-for (let i = 0; i < 5; i++) {
-    console.log("Hello via Bun!");
-    console.log(Bun.argv);
-    await Bun.sleep(5 * 1000);
-}
+const run_id = Bun.argv[2];
+console.log(`started worker run with id ${run_id}`);
