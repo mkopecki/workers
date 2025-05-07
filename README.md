@@ -1,5 +1,5 @@
 # Workers
-[Introduction Blog Post](https://mkopecki.com/blog/workers)
+This project provides a modular chat and agent execution framework, supporting various models and agent types. ([Blog Post](https://mkopecki.com/blog/workers))
 
 # Local Setup
 set up a postgresql database and push the schema using `bunx drizzle-kit push`
